@@ -8,8 +8,8 @@ import {
   Loader2, 
   ShoppingBag, 
   Database,
-  UploadCloud,
-  Wallet
+  Library,
+  PlusSquare
 } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { seedMarketplace } from './utils/seeder';
@@ -154,26 +154,25 @@ export default function App() {
     <ErrorBoundary>
       <div className="min-h-screen bg-[#020202] text-white selection:bg-indigo-500/40 font-sans">
       {/* Navigation */}
-      <header className="fixed top-0 w-full bg-black/40 backdrop-blur-2xl border-b border-white/5 z-50">
+      <header className="fixed top-0 w-full bg-black/60 backdrop-blur-md border-b border-white/10 z-50">
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('market')}>
             <Database size={24} className="text-white group-hover:rotate-12 transition-all" />
-            <span className="font-black tracking-tighter text-3xl uppercase italic leading-none text-white">Sovereign</span>
+            <span className="text-3xl font-black italic tracking-tighter text-white">Sovereign</span>
           </div>
           
           <nav className="flex gap-10">
-            <button onClick={() => setView('market')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'market' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
-              <ShoppingBag size={24} /> Exchange
+            <button onClick={() => setView('market')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'market' ? 'text-white border-b border-indigo-500' : ''}`}>
+              <ShoppingBag size={18} /> Exchange
             </button>
-            <button onClick={() => setView('library')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'library' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
-              <Shield size={24} /> Library
+            <button onClick={() => setView('library')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'library' ? 'text-white border-b border-indigo-500' : ''}`}>
+              <Library size={18} /> Library
             </button>
-            <button onClick={() => setView('studio')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'studio' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
-              <UploadCloud size={24} /> Studio
+            <button onClick={() => setView('studio')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'studio' ? 'text-white border-b border-indigo-500' : ''}`}>
+              <PlusSquare size={18} /> Studio
             </button>
           </nav>
-          <button className="flex items-center gap-2 px-4 py-2 border border-indigo-500 rounded-2xl text-[11px] font-black uppercase tracking-widest text-indigo-400 hover:bg-indigo-500/10 transition-all">
-            <Wallet size={14} />
+          <button className="border border-white/20 px-6 py-2 rounded-none hover:bg-white hover:text-black transition-all font-bold uppercase text-[10px] tracking-[0.2em]">
             Connect
           </button>
         </div>
