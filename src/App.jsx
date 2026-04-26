@@ -74,12 +74,6 @@ export default function App() {
     
     signInAnonymously(auth).catch(e => {
       console.error("Protocol Error:", e);
-      // If auth configuration is missing, fallback to mock user for development
-      if (e.code === 'auth/configuration-not-found' && import.meta.env.DEV) {
-        console.warn('Using mock user for development due to missing Firebase Auth configuration');
-        setUser({ uid: 'dev-user-123' });
-        setIsLoading(false);
-      }
     });
     return () => unsub();
   }, []);
@@ -117,7 +111,7 @@ export default function App() {
     }
   };
 
-  if (isLoading || !user) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-[#020202] flex flex-col items-center justify-center text-white">
         <Zap className="text-indigo-400 animate-pulse mb-6" size={24} />
