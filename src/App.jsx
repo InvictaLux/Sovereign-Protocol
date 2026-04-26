@@ -22,22 +22,20 @@ import {
 } from 'lucide-react';
 
 // --- CONFIGURATION ---
-const firebaseConfig = typeof __firebase_config !== 'undefined' && __firebase_config
-  ? (() => {
-      try {
-        const parsed = JSON.parse(__firebase_config);
-        return parsed && typeof parsed === 'object' ? parsed : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
-      } catch (e) {
-        console.error('Invalid firebase config:', e);
-        return { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
-      }
-    })()
-  : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' && __app_id ? __app_id : 'sovereign-exchange-v1';
+const appId = import.meta.env.VITE_APP_ID || 'sovereign-exchange-v1';
 
 // --- DATABASE SEEDER ---
 const runGenesisSeed = async () => {

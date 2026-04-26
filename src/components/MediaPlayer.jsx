@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Play, Pause, X, Zap, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { Play, Pause, Zap, ChevronDown } from 'lucide-react';
 
 export default function MediaPlayer({ item, onClose }) {
   const [isPlaying, setIsPlaying] = useState(true);
