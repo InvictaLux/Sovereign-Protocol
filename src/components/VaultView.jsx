@@ -18,7 +18,7 @@ export default function VaultView({ userVault, marketItems }) {
           marketItems.filter(i => userVault.includes(i.id)).map(item => (
             <div key={item.id} className="bg-zinc-900/30 p-8 rounded-[3.5rem] border border-white/5 flex items-center justify-between group hover:bg-zinc-900/50 transition-all duration-500">
               <div className="flex items-center gap-8">
-                <img src={item.thumbnail_url} className="w-28 h-28 rounded-3xl object-cover shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-1000" alt="" />
+                <img src={item.thumbnail_url} className="w-28 h-28 rounded-3xl object-cover shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-1000 bg-zinc-900 border border-white/5" alt="" />
                 <div>
                   <h4 className="font-bold text-3xl mb-2 tracking-tight">{item.title}</h4>
                   <div className="flex items-center gap-2 text-indigo-400">

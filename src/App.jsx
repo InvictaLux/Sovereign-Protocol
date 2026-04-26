@@ -3,6 +3,7 @@ import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { 
   Zap, 
+  Shield, 
   X, 
   Loader2, 
   Lock, 
@@ -15,9 +16,10 @@ import { seedMarketplace } from './utils/seeder';
 // Lazy load components
 const MarketView = lazy(() => import('./components/MarketView'));
 const VaultView = lazy(() => import('./components/VaultView'));
+const Studio = lazy(() => import('./components/Studio'));
 
 export default function App() {
-  const [view, setView] = useState('market'); // 'market' | 'vault'
+  const [view, setView] = useState('market'); // 'market' | 'vault' | 'studio'
   const [user, setUser] = useState(null);
   const [marketItems, setMarketItems] = useState([]);
   const [userVault, setUserVault] = useState([]);
@@ -40,10 +42,10 @@ export default function App() {
             setMarketItems([
               {
                 id: 'mock-item-1',
-                title: 'Synthetic Dreams',
+                title: 'After Hours',
                 artist_name: 'The Sovereign',
                 price_current: 1.25,
-                thumbnail_url: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=800',
+                thumbnail_url: 'https://images.unsplash.com/photo-1514525253361-b83f859b71c0?auto=format&fit=crop&q=80&w=800',
                 media_type: 'audio'
               },
               {
@@ -51,7 +53,7 @@ export default function App() {
                 title: 'Neon Citadel',
                 artist_name: 'Binary Pulse',
                 price_current: 3.50,
-                thumbnail_url: 'https://images.unsplash.com/photo-1514525253344-f814d074e015?auto=format&fit=crop&q=80&w=800',
+                thumbnail_url: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=800',
                 media_type: 'video'
               },
               {
@@ -59,7 +61,7 @@ export default function App() {
                 title: 'Cold Storage',
                 artist_name: 'Zero Day',
                 price_current: 0.75,
-                thumbnail_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&q=80&w=800',
+                thumbnail_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=800',
                 media_type: 'audio'
               }
             ]);
@@ -117,7 +119,7 @@ export default function App() {
   if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-[#020202] flex flex-col items-center justify-center text-white">
-        <Zap className="text-indigo-500 animate-pulse mb-6" size={56} />
+        <Zap className="text-indigo-400 animate-pulse mb-6" size={24} />
         <div className="w-48 h-[1px] bg-white/10 relative overflow-hidden">
           <div className="absolute inset-0 bg-indigo-500 animate-progress" style={{ width: '40%' }}></div>
         </div>
@@ -133,7 +135,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('market')}>
             <div className="p-2.5 bg-indigo-600 rounded-2xl group-hover:rotate-12 transition-all shadow-[0_0_30px_rgba(79,70,229,0.3)]">
-              <Database size={20} fill="currentColor" />
+              <Database size={24} className="text-indigo-400" fill="currentColor" />
             </div>
             <span className="font-black tracking-tighter text-2xl uppercase italic leading-none">Sovereign</span>
           </div>
@@ -144,6 +146,9 @@ export default function App() {
             </button>
             <button onClick={() => setView('vault')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'vault' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
               <Lock size={14} /> Vault
+            </button>
+            <button onClick={() => setView('studio')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'studio' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
+              <Database size={14} /> Studio
             </button>
           </nav>
         </div>
@@ -162,10 +167,15 @@ export default function App() {
               userVault={userVault} 
               setSelectedAsset={setSelectedAsset} 
             />
-          ) : (
+          ) : view === 'vault' ? (
             <VaultView 
               userVault={userVault} 
               marketItems={marketItems} 
+            />
+          ) : (
+            <Studio 
+              user={user} 
+              auth={auth}
             />
           )}
         </Suspense>
@@ -205,7 +215,7 @@ export default function App() {
           <div className="relative mb-10">
             <Loader2 className="animate-spin text-indigo-500" size={96} strokeWidth={1} />
             <div className="absolute inset-0 flex items-center justify-center">
-              <Zap size={24} className="text-indigo-400 animate-pulse" />
+              <Shield size={24} className="text-indigo-400 animate-pulse" />
             </div>
           </div>
           <p className="text-[14px] font-black uppercase tracking-[0.8em] text-white">Validating Protocol Ledger</p>

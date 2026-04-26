@@ -24,19 +24,19 @@ export const seedMarketplace = async () => {
         price_current: 1.00, // Component expects price_current as a number
         media_type: 'audio',
         url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-        thumbnail_url: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800&h=600&fit=crop',
+        thumbnail_url: 'https://images.unsplash.com/photo-1514525253361-b83f859b71c0?w=800&h=600&fit=crop',
         views: 0,
         likes: 0,
         createdAt: serverTimestamp()
       },
       {
-        title: 'Live at The Citadel',
+        title: 'Neon Citadel',
         artist_name: 'Neon Architect',
         description: 'An explosive live performance captured at the legendary Citadel venue',
         price_current: 2.50,
         media_type: 'video',
         url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        thumbnail_url: 'https://images.unsplash.com/photo-1471478311145-2fd8b5fcc693?w=800&h=600&fit=crop',
+        thumbnail_url: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&h=600&fit=crop',
         views: 0,
         likes: 0,
         createdAt: serverTimestamp()
@@ -48,7 +48,7 @@ export const seedMarketplace = async () => {
         price_current: 0.50,
         media_type: 'audio',
         url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-        thumbnail_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop',
+        thumbnail_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&h=600&fit=crop',
         views: 0,
         likes: 0,
         createdAt: serverTimestamp()
