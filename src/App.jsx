@@ -6,9 +6,10 @@ import {
   Shield, 
   X, 
   Loader2, 
-  Lock, 
   ShoppingBag, 
-  Database
+  Database,
+  UploadCloud,
+  Wallet
 } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { seedMarketplace } from './utils/seeder';
@@ -134,10 +135,8 @@ export default function App() {
       <header className="fixed top-0 w-full bg-black/40 backdrop-blur-2xl border-b border-white/5 z-50">
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('market')}>
-            <div className="p-2.5 bg-indigo-600 rounded-2xl group-hover:rotate-12 transition-all shadow-[0_0_30px_rgba(79,70,229,0.3)]">
-              <Database size={24} className="text-indigo-400" fill="currentColor" />
-            </div>
-            <span className="font-black tracking-tighter text-2xl uppercase italic leading-none">Sovereign</span>
+            <Database size={24} className="text-white group-hover:rotate-12 transition-all" />
+            <span className="font-black tracking-tighter text-3xl uppercase italic leading-none text-white">Sovereign</span>
           </div>
           
           <nav className="flex gap-10">
@@ -145,12 +144,16 @@ export default function App() {
               <ShoppingBag size={14} /> Exchange
             </button>
             <button onClick={() => setView('vault')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'vault' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
-              <Lock size={14} /> Vault
+              <Shield size={14} /> Vault
             </button>
             <button onClick={() => setView('studio')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'studio' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
-              <Database size={14} /> Studio
+              <UploadCloud size={14} /> Studio
             </button>
           </nav>
+          <button className="flex items-center gap-2 px-4 py-2 border border-indigo-500 rounded-2xl text-[11px] font-black uppercase tracking-widest text-indigo-400 hover:bg-indigo-500/10 transition-all">
+            <Wallet size={14} />
+            Connect
+          </button>
         </div>
       </header>
 
