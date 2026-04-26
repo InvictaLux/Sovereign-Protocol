@@ -1,143 +1,59 @@
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Play, Pause, Volume2, Maximize2 } from 'lucide-react'
-import { useState } from 'react'
+import React, { useState } from 'react';
+import { Play, Pause, X, Zap, ChevronDown } from 'lucide-react';
 
-const MediaPlayer = ({ media, onClose }) => {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [volume, setVolume] = useState(1)
-  const [isFullscreen, setIsFullscreen] = useState(false)
-
-  if (!media) return null
+export default function MediaPlayer({ item, onClose }) {
+  const [isPlaying, setIsPlaying] = useState(true);
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center"
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className={`bg-zinc-900 rounded-lg overflow-hidden ${isFullscreen ? 'w-full h-full' : 'w-full max-w-4xl max-h-[90vh]'}`}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-zinc-800">
-            <div>
-              <h2 className="text-xl font-bold text-white">{media.title || 'Untitled Media'}</h2>
-              <p className="text-sm text-zinc-400">{media.description || 'No description available'}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5 text-white" />
-            </button>
-          </div>
+    <div className="fixed inset-0 z-[150] bg-black flex flex-col animate-in slide-in-from-bottom duration-500">
+      <div className="flex items-center justify-between p-8">
+        <button onClick={onClose} className="text-zinc-500 hover:text-white transition">
+          <ChevronDown size={32} />
+        </button>
+        <div className="flex items-center gap-2">
+          <Zap className="text-indigo-500 fill-current" size={16} />
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Now Decrypting</span>
+        </div>
+        <div className="w-8" />
+      </div>
 
-          {/* Media Content */}
-          <div className="relative bg-black aspect-video">
-            {media.type === 'video' ? (
-              <video
-                className="w-full h-full object-contain"
-                controls
-                src={media.url}
-              />
-            ) : media.type === 'audio' ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <div className="w-32 h-32 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Play className="w-16 h-16 text-white" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">{media.title}</h3>
-                  <audio
-                    controls
-                    className="w-full max-w-md"
-                    src={media.url}
-                  />
-                </div>
-              </div>
+      <div className="flex-1 flex flex-col items-center justify-center px-10 space-y-12">
+        <div className="w-full max-w-xs aspect-square rounded-[3.5rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(79,70,229,0.5)] border border-white/10">
+          <img 
+            src={item.thumbnail_url} 
+            className={`w-full h-full object-cover transition-transform duration-[10000ms] ${isPlaying ? 'scale-125' : 'scale-100'}`} 
+            alt={item.title}
+          />
+        </div>
+
+        <div className="text-center space-y-2">
+          <h2 className="text-4xl font-black tracking-tighter">{item.title}</h2>
+          <p className="text-xl text-zinc-500 font-bold tracking-tight">{item.artist_name}</p>
+        </div>
+
+        <div className="flex items-center gap-12">
+          <button 
+            onClick={() => setIsPlaying(!isPlaying)} 
+            className="w-24 h-24 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-2xl"
+          >
+            {isPlaying ? (
+              <Pause size={40} fill="currentColor" />
             ) : (
-              <div className="flex items-center justify-center h-full">
-                <img
-                  src={media.url}
-                  alt={media.title}
-                  className="max-w-full max-h-full object-contain"
-                />
-              </div>
+              <Play size={40} fill="currentColor" className="ml-2" />
             )}
-          </div>
-
-          {/* Controls */}
-          <div className="flex items-center justify-between p-4 border-t border-zinc-800">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-              >
-                {isPlaying ? (
-                  <Pause className="w-5 h-5 text-white" />
-                ) : (
-                  <Play className="w-5 h-5 text-white" />
-                )}
-              </button>
-              
-              <div className="flex items-center space-x-2">
-                <Volume2 className="w-5 h-5 text-zinc-400" />
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.1"
-                  value={volume}
-                  onChange={(e) => setVolume(parseFloat(e.target.value))}
-                  className="w-24"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-zinc-400">
-                {media.views || 0} views
-              </span>
-              <button
-                onClick={() => setIsFullscreen(!isFullscreen)}
-                className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-              >
-                <Maximize2 className="w-5 h-5 text-white" />
-              </button>
-            </div>
-          </div>
-
-          {/* Metadata */}
-          <div className="p-4 border-t border-zinc-800">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-zinc-400">Type:</span>
-                <span className="ml-2 text-white capitalize">{media.type}</span>
-              </div>
-              <div>
-                <span className="text-zinc-400">Duration:</span>
-                <span className="ml-2 text-white">{media.duration || 'Unknown'}</span>
-              </div>
-              <div>
-                <span className="text-zinc-400">Uploaded:</span>
-                <span className="ml-2 text-white">
-                  {media.createdAt?.toDate()?.toLocaleDateString() || 'Unknown'}
-                </span>
-              </div>
-              <div>
-                <span className="text-zinc-400">Price:</span>
-                <span className="ml-2 text-white">{media.price || 'Free'}</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  )
+          </button>
+        </div>
+        
+        <div className="w-full max-w-xs h-1 bg-white/10 rounded-full overflow-hidden">
+          <div className={`h-full bg-indigo-500 transition-all duration-500 ${isPlaying ? 'w-1/3' : 'w-0'}`} />
+        </div>
+      </div>
+      
+      <div className="p-12 text-center">
+        <p className="text-[9px] text-zinc-600 font-mono uppercase tracking-[0.2em]">
+          Media Streamed via IPFS Node • Sovereign Protocol v1.0
+        </p>
+      </div>
+    </div>
+  );
 }
-
-export default MediaPlayer

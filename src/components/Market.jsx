@@ -1,167 +1,48 @@
-import { motion } from 'framer-motion'
-import { Play, Music, Image, Download, Heart, Share2, Eye } from 'lucide-react'
-import { clsx } from 'clsx'
+import React from 'react';
+import { ShieldCheck } from 'lucide-react';
 
-const Market = ({ marketplaceData, userLibrary, onMediaSelect }) => {
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'video':
-        return <Play className="w-4 h-4" />
-      case 'audio':
-        return <Music className="w-4 h-4" />
-      case 'image':
-        return <Image className="w-4 h-4" />
-      default:
-        return <Play className="w-4 h-4" />
-    }
-  }
-
-  const isInLibrary = (mediaId) => {
-    return userLibrary.some(item => item.id === mediaId)
+export default function Market({ items = [], ownedIds = [], onItemClick = () => {} }) {
+  // Safety check to prevent "map" error if items is null or undefined
+  if (!items || !Array.isArray(items)) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-8 animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="aspect-square rounded-[2.5rem] bg-zinc-900 border border-white/5" />
+        ))}
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-white">Sovereign Marketplace</h1>
-        <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
-          Discover and collect premium digital media from creators around the world
-        </p>
-        <div className="flex items-center justify-center space-x-8 text-sm text-zinc-400">
-          <span>{marketplaceData.length} items available</span>
-          <span>{userLibrary.length} in your library</span>
-        </div>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center justify-center space-x-4 border-b border-zinc-800">
-        {['All', 'Video', 'Audio', 'Image'].map((filter) => (
-          <button
-            key={filter}
-            className={clsx(
-              'px-4 py-2 text-sm font-medium transition-colors border-b-2',
-              filter === 'All'
-                ? 'text-indigo-400 border-indigo-400'
-                : 'text-zinc-400 border-transparent hover:text-white hover:border-zinc-600'
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-8 animate-in fade-in duration-700">
+      {items.map((item) => (
+        <div 
+          key={item.id} 
+          onClick={() => onItemClick(item)}
+          className="group cursor-pointer"
+        >
+          <div className="aspect-square rounded-[2.5rem] overflow-hidden bg-zinc-900 border border-white/5 relative mb-4 shadow-xl group-hover:border-indigo-500/50 transition-all duration-500">
+            <img 
+              src={item.thumbnail_url} 
+              alt={item.title}
+              className="w-full h-full object-cover group-hover:scale-110 transition duration-700" 
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=1000'; }}
+            />
+            <div className="absolute bottom-4 right-4 px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl text-[10px] font-black tracking-widest">
+              ${typeof item.price_current === 'number' ? item.price_current.toFixed(2) : '0.00'}
+            </div>
+            {ownedIds && ownedIds.includes(item.id) && (
+              <div className="absolute top-4 left-4 p-2 bg-indigo-500 rounded-2xl shadow-2xl">
+                <ShieldCheck size={14} className="text-white" />
+              </div>
             )}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
-
-      {/* Media Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {marketplaceData.map((media, index) => (
-          <motion.div
-            key={media.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            className="bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition-colors cursor-pointer group"
-            onClick={() => onMediaSelect(media)}
-          >
-            {/* Thumbnail */}
-            <div className="relative aspect-video bg-black overflow-hidden">
-              {media.type === 'image' ? (
-                <img
-                  src={media.thumbnail || media.url}
-                  alt={media.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    {getTypeIcon(media.type)}
-                    <p className="text-xs mt-2 capitalize">{media.type}</p>
-                  </div>
-                </div>
-              )}
-              
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity duration-300 flex items-center justify-center">
-                <Play className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-
-              {/* Price Badge */}
-              {media.price && (
-                <div className="absolute top-2 right-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded">
-                  {media.price}
-                </div>
-              )}
-            </div>
-
-            {/* Content */}
-            <div className="p-4 space-y-2">
-              <h3 className="font-semibold text-white truncate">
-                {media.title || 'Untitled Media'}
-              </h3>
-              <p className="text-sm text-zinc-400 line-clamp-2">
-                {media.description || 'No description available'}
-              </p>
-              
-              {/* Metadata */}
-              <div className="flex items-center justify-between text-xs text-zinc-500">
-                <div className="flex items-center space-x-3">
-                  <span className="flex items-center space-x-1">
-                    <Eye className="w-3 h-3" />
-                    <span>{media.views || 0}</span>
-                  </span>
-                  <span className="flex items-center space-x-1">
-                    <Heart className="w-3 h-3" />
-                    <span>{media.likes || 0}</span>
-                  </span>
-                </div>
-                <span>
-                  {media.createdAt?.toDate()?.toLocaleDateString() || ''}
-                </span>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center space-x-2 pt-2">
-                <button
-                  className={clsx(
-                    'flex-1 py-2 px-3 rounded text-xs font-medium transition-colors',
-                    isInLibrary(media.id)
-                      ? 'bg-zinc-700 text-zinc-300'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    // Handle library add/remove
-                  }}
-                >
-                  {isInLibrary(media.id) ? 'In Library' : 'Add to Library'}
-                </button>
-                
-                <button
-                  className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    // Handle share
-                  }}
-                >
-                  <Share2 className="w-4 h-4 text-zinc-400" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {marketplaceData.length === 0 && (
-        <div className="text-center py-16">
-          <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Play className="w-8 h-8 text-zinc-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">No media available</h3>
-          <p className="text-zinc-400">Check back later for new content</p>
+          <h3 className="font-bold text-sm px-1 truncate">{item.title || 'Untitled Asset'}</h3>
+          <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em] px-1 mt-1">
+            {item.artist_name || 'Unknown Artist'}
+          </p>
         </div>
-      )}
+      ))}
     </div>
-  )
+  );
 }
-
-export default Market
