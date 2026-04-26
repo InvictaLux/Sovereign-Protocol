@@ -16,11 +16,11 @@ import { seedMarketplace } from './utils/seeder';
 
 // Lazy load components
 const MarketView = lazy(() => import('./components/MarketView'));
-const VaultView = lazy(() => import('./components/VaultView'));
+const LibraryView = lazy(() => import('./components/LibraryView'));
 const Studio = lazy(() => import('./components/Studio'));
 
 export default function App() {
-  const [view, setView] = useState('market'); // 'market' | 'vault' | 'studio'
+  const [view, setView] = useState('market'); // 'market' | 'library' | 'studio'
   const [user, setUser] = useState(null);
   const [marketItems, setMarketItems] = useState([]);
   const [userVault, setUserVault] = useState([]);
@@ -72,8 +72,15 @@ export default function App() {
       setIsLoading(false);
     });
     
+    console.log('Current Auth Object:', auth.config);
     signInAnonymously(auth).catch(e => {
       console.error("Protocol Error:", e);
+      // If auth configuration is missing, fallback to Guest Mode
+      if (e.code === 'auth/configuration-not-found') {
+        console.warn('Falling back to Guest Mode due to Firebase Auth configuration issue');
+        setUser({ uid: 'guest-user', isGuest: true });
+        setIsLoading(false);
+      }
     });
     return () => unsub();
   }, []);
@@ -102,7 +109,7 @@ export default function App() {
       const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'library', asset.id);
       await setDoc(docRef, { ...asset, acquiredAt: Date.now(), status: 'verified' });
       setSelectedAsset(null);
-      setView('vault');
+      setView('library');
     } catch (e) {
       console.error('Failed to acquire asset:', e);
       // TODO: Add user notification here
@@ -135,13 +142,13 @@ export default function App() {
           
           <nav className="flex gap-10">
             <button onClick={() => setView('market')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'market' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
-              <ShoppingBag size={14} /> Exchange
+              <ShoppingBag size={24} /> Exchange
             </button>
-            <button onClick={() => setView('vault')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'vault' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
-              <Shield size={14} /> Vault
+            <button onClick={() => setView('library')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'library' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
+              <Shield size={24} /> Library
             </button>
             <button onClick={() => setView('studio')} className={`text-[11px] font-black uppercase tracking-[0.25em] flex items-center gap-2 transition ${view === 'studio' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
-              <UploadCloud size={14} /> Studio
+              <UploadCloud size={24} /> Studio
             </button>
           </nav>
           <button className="flex items-center gap-2 px-4 py-2 border border-indigo-500 rounded-2xl text-[11px] font-black uppercase tracking-widest text-indigo-400 hover:bg-indigo-500/10 transition-all">
@@ -164,8 +171,8 @@ export default function App() {
               userVault={userVault} 
               setSelectedAsset={setSelectedAsset} 
             />
-          ) : view === 'vault' ? (
-            <VaultView 
+          ) : view === 'library' ? (
+            <LibraryView 
               userVault={userVault} 
               marketItems={marketItems} 
             />

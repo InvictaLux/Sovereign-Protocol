@@ -1,18 +1,18 @@
 import { Lock, ShieldCheck, Play } from 'lucide-react';
 
-export default function VaultView({ userVault, marketItems }) {
+export default function LibraryView({ userVault, marketItems }) {
   return (
     <section className="animate-in fade-in slide-in-from-bottom-6 duration-1000">
       <div className="mb-16">
-        <h1 className="text-6xl font-black tracking-tighter italic uppercase mb-4">Secure Vault</h1>
-        <p className="text-zinc-500 max-w-lg font-medium">Digital deeds verified and locked to your private node.</p>
+        <h1 className="text-6xl font-black tracking-tighter italic uppercase mb-4">Digital Library</h1>
+        <p className="text-zinc-500 max-w-lg font-medium">Your collection of verified digital assets and media.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {userVault.length === 0 ? (
           <div className="col-span-full py-48 text-center border-2 border-dashed border-white/5 rounded-[4rem]">
             <Lock className="mx-auto text-zinc-900 mb-6" size={64} />
-            <p className="text-zinc-700 font-black tracking-[0.4em] uppercase text-xs">No Assets Verified in Node</p>
+            <p className="text-zinc-700 font-black tracking-[0.4em] uppercase text-xs">No Assets in Library</p>
           </div>
         ) : (
           marketItems.filter(i => userVault.includes(i.id)).map(item => (

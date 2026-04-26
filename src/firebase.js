@@ -4,19 +4,19 @@ import { getFirestore } from 'firebase/firestore';
 
 // Debug environment variables
 console.log('Environment check:', {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY?.substring(0, 10) + '...',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID
+  apiKey: "AIzaSyAp9SVo4O0AUjECHbkgsNq7GMvwitDfb5s",
+  authDomain: "sovereign-protocol.firebaseapp.com",
+  projectId: "sovereign-protocol"
 });
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyAp9SVo4O0AUjECHbkgsNq7GMvwitDfb5s",
+  authDomain: "sovereign-protocol.firebaseapp.com",
+  projectId: "sovereign-protocol",
+  storageBucket: "sovereign-protocol.firebasestorage.app",
+  messagingSenderId: "1032018451344",
+  appId: "1:1032018451344:web:19f03f51496f67f4227115",
+  measurementId: "G-MC3FD6VPKB"
 };
 
 // Validate required fields and check for placeholder values

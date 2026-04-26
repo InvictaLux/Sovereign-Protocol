@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Auth Test</title>
+</head>
+<body>
+    <h1>Firebase Authentication Test</h1>
+    <button onclick="testAuth()">Test Anonymous Auth</button>
+    <div id="result"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    
+    <script>
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAp9SVo4O0AUjECHbkgsNq7GMvwitDfb5s",
+            authDomain: "sovereign-protocol.firebaseapp.com",
+            projectId: "sovereign-protocol",
+            storageBucket: "sovereign-protocol.firebasestorage.app",
+            messagingSenderId: "1032018451344",
+            appId: "1:1032018451344:web:19f03f51496f67f4227115"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        function testAuth() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            auth.signInAnonymously()
+                .then((userCredential) => {
+                    resultDiv.innerHTML = `
+                        <h3>✅ SUCCESS!</h3>
+                        <p>User ID: ${userCredential.user.uid}</p>
+                        <p>Anonymous Authentication is working!</p>
+                    `;
+                })
+                .catch((error) => {
+                    resultDiv.innerHTML = `
+                        <h3>❌ FAILED!</h3>
+                        <p>Error Code: ${error.code}</p>
+                        <p>Error Message: ${error.message}</p>
+                        <p><strong>This means Anonymous Authentication is NOT enabled in Firebase Console.</strong></p>
+                        <p>
+                            <strong>FIX:</strong><br>
+                            1. Go to https://console.firebase.google.com<br>
+                            2. Select project: sovereign-protocol<br>
+                            3. Go to Authentication → Sign-in method<br>
+                            4. Click "Add new provider"<br>
+                            5. Select "Anonymous" and enable it<br>
+                            6. Save the configuration
+                        </p>
+                    `;
+                });
+        }
+    </script>
+</body>
+</html>
