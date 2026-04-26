@@ -16,7 +16,7 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset })
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
               <div className="absolute bottom-6 right-6 px-4 py-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black tracking-widest">
-                ${typeof item.price_current === 'number' ? item.price_current.toFixed(2) : '0.00'}
+                ${typeof item.price_current === 'number' && item.price_current != null ? item.price_current.toFixed(2) : '0.00'}
               </div>
               
               {userVault.includes(item.id) && (

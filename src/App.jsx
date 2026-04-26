@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { seedMarketplace } from './utils/seeder';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy load components
 const MarketView = lazy(() => import('./components/MarketView'));
@@ -30,8 +31,14 @@ export default function App() {
 
   // Phase 1: Authentication & Seeding
   useEffect(() => {
+    let isMounted = true;
+    let authTimeoutId;
+
     const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!isMounted) return;
+      
       setUser(user);
+      
       if (user) {
         try {
           await seedMarketplace();
@@ -69,20 +76,32 @@ export default function App() {
           }
         }
       }
-      setIsLoading(false);
-    });
-    
-    console.log('Current Auth Object:', auth.config);
-    signInAnonymously(auth).catch(e => {
-      console.error("Protocol Error:", e);
-      // If auth configuration is missing, fallback to Guest Mode
-      if (e.code === 'auth/configuration-not-found') {
-        console.warn('Falling back to Guest Mode due to Firebase Auth configuration issue');
-        setUser({ uid: 'guest-user', isGuest: true });
+      
+      if (isMounted) {
         setIsLoading(false);
       }
     });
-    return () => unsub();
+    
+    // Clear any existing timeout and set a new one for sign-in
+    authTimeoutId = setTimeout(() => {
+      if (!auth.currentUser && isMounted) {
+        signInAnonymously(auth).catch(e => {
+          console.error("Protocol Error:", e);
+          // If auth configuration is missing, fallback to Guest Mode
+          if (e.code === 'auth/configuration-not-found') {
+            console.warn('Falling back to Guest Mode due to Firebase Auth configuration issue');
+            setUser({ uid: 'guest-user', isGuest: true });
+            setIsLoading(false);
+          }
+        });
+      }
+    }, 100);
+    
+    return () => {
+      isMounted = false;
+      if (authTimeoutId) clearTimeout(authTimeoutId);
+      unsub();
+    };
   }, []);
 
   // Phase 2: Real-time Data Streaming
@@ -103,7 +122,7 @@ export default function App() {
   }, [user]);
 
   const acquireAsset = async (asset) => {
-    if (!user) return;
+    if (!user || !asset || !asset.id) return;
     setIsSyncing(true);
     try {
       const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'library', asset.id);
@@ -112,7 +131,8 @@ export default function App() {
       setView('library');
     } catch (e) {
       console.error('Failed to acquire asset:', e);
-      // TODO: Add user notification here
+      // Show user-friendly error message
+      alert(`Failed to acquire asset: ${e.message || 'Unknown error occurred'}`);
     } finally {
       setIsSyncing(false);
     }
@@ -131,7 +151,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020202] text-white selection:bg-indigo-500/40 font-sans">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-[#020202] text-white selection:bg-indigo-500/40 font-sans">
       {/* Navigation */}
       <header className="fixed top-0 w-full bg-black/40 backdrop-blur-2xl border-b border-white/5 z-50">
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -207,7 +228,7 @@ export default function App() {
                 : 'bg-indigo-600 text-white hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 shadow-indigo-600/30'
               }`}
             >
-              {userVault.includes(selectedAsset.id) ? 'Asset Verified' : `Acquire Verified Deed — $${typeof selectedAsset.price_current === 'number' ? selectedAsset.price_current.toFixed(2) : '0.00'}`}
+              {userVault.includes(selectedAsset.id) ? 'Asset Verified' : `Acquire Verified Deed — $${typeof selectedAsset.price_current === 'number' && selectedAsset.price_current != null ? selectedAsset.price_current.toFixed(2) : '0.00'}`}
             </button>
           </div>
         </div>
@@ -230,6 +251,7 @@ export default function App() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

@@ -2,22 +2,25 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Debug environment variables
-console.log('Environment check:', {
-  apiKey: "AIzaSyAp9SVo4O0AUjECHbkgsNq7GMvwitDfb5s",
-  authDomain: "sovereign-protocol.firebaseapp.com",
-  projectId: "sovereign-protocol"
-});
-
+// Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyAp9SVo4O0AUjECHbkgsNq7GMvwitDfb5s",
-  authDomain: "sovereign-protocol.firebaseapp.com",
-  projectId: "sovereign-protocol",
-  storageBucket: "sovereign-protocol.firebasestorage.app",
-  messagingSenderId: "1032018451344",
-  appId: "1:1032018451344:web:19f03f51496f67f4227115",
-  measurementId: "G-MC3FD6VPKB"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || ''
 };
+
+// Debug environment variables (only in development)
+if (import.meta.env.DEV) {
+  console.log('Environment check:', {
+    hasApiKey: !!firebaseConfig.apiKey,
+    hasProjectId: !!firebaseConfig.projectId,
+    projectId: firebaseConfig.projectId
+  });
+}
 
 // Validate required fields and check for placeholder values
 const isInvalidConfig = !firebaseConfig.apiKey || 
@@ -48,15 +51,15 @@ if (isInvalidConfig && import.meta.env.DEV) {
   db = {
     collection: () => ({
       onSnapshot: (callback) => {
-        // Mock sample data for development
+        // Mock sample data for development (matching App.jsx fallback data)
         const mockDocs = [
           {
             id: 'mock-item-1',
             data: () => ({
-              title: 'Synthetic Dreams',
+              title: 'After Hours',
               artist_name: 'The Sovereign',
               price_current: 1.25,
-              thumbnail_url: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=800',
+              thumbnail_url: 'https://images.unsplash.com/photo-1514525253361-b83f859b71c0?auto=format&fit=crop&q=80&w=800',
               media_type: 'audio'
             })
           },
@@ -66,7 +69,7 @@ if (isInvalidConfig && import.meta.env.DEV) {
               title: 'Neon Citadel',
               artist_name: 'Binary Pulse',
               price_current: 3.50,
-              thumbnail_url: 'https://images.unsplash.com/photo-1514525253344-f814d074e015?auto=format&fit=crop&q=80&w=800',
+              thumbnail_url: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=800',
               media_type: 'video'
             })
           },
@@ -76,7 +79,7 @@ if (isInvalidConfig && import.meta.env.DEV) {
               title: 'Cold Storage',
               artist_name: 'Zero Day',
               price_current: 0.75,
-              thumbnail_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&q=80&w=800',
+              thumbnail_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=800',
               media_type: 'audio'
             })
           }
