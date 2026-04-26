@@ -30,12 +30,54 @@ export default function App() {
     const unsub = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        await seedMarketplace();
+        try {
+          await seedMarketplace();
+        } catch (error) {
+          console.error('Seeding failed:', error);
+          // Fallback: add mock data if Firebase seeding fails
+          if (import.meta.env.DEV) {
+            console.warn('Using mock marketplace data for development');
+            setMarketItems([
+              {
+                id: 'mock-item-1',
+                title: 'Synthetic Dreams',
+                artist_name: 'The Sovereign',
+                price_current: 1.25,
+                thumbnail_url: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=800',
+                media_type: 'audio'
+              },
+              {
+                id: 'mock-item-2',
+                title: 'Neon Citadel',
+                artist_name: 'Binary Pulse',
+                price_current: 3.50,
+                thumbnail_url: 'https://images.unsplash.com/photo-1514525253344-f814d074e015?auto=format&fit=crop&q=80&w=800',
+                media_type: 'video'
+              },
+              {
+                id: 'mock-item-3',
+                title: 'Cold Storage',
+                artist_name: 'Zero Day',
+                price_current: 0.75,
+                thumbnail_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&q=80&w=800',
+                media_type: 'audio'
+              }
+            ]);
+          }
+        }
       }
       setIsLoading(false);
     });
     
-    signInAnonymously(auth).catch(e => console.error("Protocol Error:", e));
+    signInAnonymously(auth).catch(e => {
+      console.error("Protocol Error:", e);
+      // If auth configuration is missing, fallback to mock user for development
+      if (e.code === 'auth/configuration-not-found' && import.meta.env.DEV) {
+        console.warn('Using mock user for development due to missing Firebase Auth configuration');
+        setUser({ uid: 'dev-user-123' });
+        setIsLoading(false);
+      }
+    });
     return () => unsub();
   }, []);
 
