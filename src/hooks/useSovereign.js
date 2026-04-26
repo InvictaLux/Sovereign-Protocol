@@ -8,10 +8,8 @@ import {
 import { 
   getFirestore, 
   collection, 
-  doc, 
   onSnapshot,
   query,
-  where,
   orderBy,
   limit 
 } from 'firebase/firestore';
@@ -51,7 +49,14 @@ export const useSovereign = (appId) => {
   // Initialize authentication
   useEffect(() => {
     if (!user && !loading) {
-      signInAnonymouslyIfNeeded();
+      const initAuth = async () => {
+        try {
+          await signInAnonymouslyIfNeeded();
+        } catch (error) {
+          console.error('Auth initialization failed:', error);
+        }
+      };
+      initAuth();
     }
   }, [user, loading, signInAnonymouslyIfNeeded]);
 
@@ -89,16 +94,13 @@ export const useSovereign = (appId) => {
   useEffect(() => {
     if (!user || !appId) return;
 
-    const libraryRef = doc(db, 'artifacts', appId, 'users', user.uid, 'library');
+    const libraryRef = collection(db, 'artifacts', appId, 'users', user.uid, 'library');
     
     const unsubscribe = onSnapshot(
       libraryRef,
-      (doc) => {
-        if (doc.exists()) {
-          setUserLibrary(doc.data().items || []);
-        } else {
-          setUserLibrary([]);
-        }
+      (snapshot) => {
+        const items = snapshot.docs.map(doc => doc.id);
+        setUserLibrary(items);
         setError(null);
       },
       (error) => {

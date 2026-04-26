@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { 
@@ -18,19 +18,26 @@ import {
   Loader2, 
   Lock, 
   ShoppingBag, 
-  Database,
-  LayoutGrid
+  Database
 } from 'lucide-react';
 
 // --- CONFIGURATION ---
-const firebaseConfig = typeof __firebase_config !== 'undefined' 
-  ? JSON.parse(__firebase_config) 
+const firebaseConfig = typeof __firebase_config !== 'undefined' && __firebase_config
+  ? (() => {
+      try {
+        const parsed = JSON.parse(__firebase_config);
+        return parsed && typeof parsed === 'object' ? parsed : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
+      } catch (e) {
+        console.error('Invalid firebase config:', e);
+        return { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
+      }
+    })()
   : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'sovereign-exchange-v1';
+const appId = typeof __app_id !== 'undefined' && __app_id ? __app_id : 'sovereign-exchange-v1';
 
 // --- DATABASE SEEDER ---
 const runGenesisSeed = async () => {
@@ -85,18 +92,15 @@ export default function App() {
 
   // Phase 1: Authentication & Seeding
   useEffect(() => {
-    const bootstrap = async () => {
-      try {
-        await signInAnonymously(auth);
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      setUser(user);
+      if (user) {
         await runGenesisSeed();
-      } catch (e) {
-        console.error("Protocol Error:", e);
-      } finally {
-        setIsLoading(false);
       }
-    };
-    bootstrap();
-    const unsub = onAuthStateChanged(auth, setUser);
+      setIsLoading(false);
+    });
+    
+    signInAnonymously(auth).catch(e => console.error("Protocol Error:", e));
     return () => unsub();
   }, []);
 
@@ -121,13 +125,13 @@ export default function App() {
     if (!user) return;
     setIsSyncing(true);
     try {
-      await new Promise(r => setTimeout(r, 1800)); // Simulated ledger validation
       const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'library', asset.id);
       await setDoc(docRef, { ...asset, acquiredAt: Date.now(), status: 'verified' });
       setSelectedAsset(null);
       setView('vault');
     } catch (e) {
-      console.error(e);
+      console.error('Failed to acquire asset:', e);
+      // TODO: Add user notification here
     } finally {
       setIsSyncing(false);
     }
@@ -185,7 +189,7 @@ export default function App() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     
                     <div className="absolute bottom-6 right-6 px-4 py-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black tracking-widest">
-                      ${item.price_current?.toFixed(2)}
+                      ${typeof item.price_current === 'number' ? item.price_current.toFixed(2) : '0.00'}
                     </div>
                     
                     {userVault.includes(item.id) && (
@@ -259,7 +263,7 @@ export default function App() {
                 : 'bg-indigo-600 text-white hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 shadow-indigo-600/30'
               }`}
             >
-              {userVault.includes(selectedAsset.id) ? 'Asset Verified' : `Acquire Verified Deed — $${selectedAsset.price_current?.toFixed(2)}`}
+              {userVault.includes(selectedAsset.id) ? 'Asset Verified' : `Acquire Verified Deed — $${typeof selectedAsset.price_current === 'number' ? selectedAsset.price_current.toFixed(2) : '0.00'}`}
             </button>
           </div>
         </div>
