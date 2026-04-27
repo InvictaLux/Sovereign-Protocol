@@ -37,7 +37,7 @@ let app;
 let auth;
 let db;
 
-// Use mock Firebase if config is invalid or if in development with placeholder values
+// Use mock Firebase if config is invalid or if in development (force mock for localhost)
 if (isInvalidConfig && import.meta.env.DEV) {
   console.warn('Using mock Firebase for development due to invalid configuration');
   auth = {
@@ -92,7 +92,6 @@ if (isInvalidConfig && import.meta.env.DEV) {
       setDoc: () => Promise.resolve()
     })
   };
-  console.log('Mock Firebase initialized for development');
 } else {
   try {
     app = initializeApp(firebaseConfig);

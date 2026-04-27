@@ -10,7 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lit-protocol/lit-node-client": "^6.3.0",
+    "@lit-protocol/auth-helpers": "^6.3.0",
+    "@pinata/sdk": "^2.1.8",
     "clsx": "^2.1.1",
+    "ethers": "^5.7.2",
     "firebase": "^12.12.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.11.0",

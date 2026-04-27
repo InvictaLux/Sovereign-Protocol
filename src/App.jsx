@@ -1,6 +1,6 @@
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
-import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { 
   Zap, 
   Shield, 
@@ -9,10 +9,12 @@ import {
   ShoppingBag, 
   Database,
   Library,
-  PlusSquare
+  PlusSquare,
+  Fingerprint
 } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { seedMarketplace } from './utils/seeder';
+import { purchaseAssetOnChain } from './services/sovereignContract';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy load components
@@ -20,14 +22,53 @@ const MarketView = lazy(() => import('./components/MarketView'));
 const LibraryView = lazy(() => import('./components/LibraryView'));
 const Studio = lazy(() => import('./components/Studio'));
 
+const getViewFromPath = (pathname) => {
+  if (pathname === '/library') return 'library';
+  if (pathname === '/studio') return 'studio';
+  return 'market';
+};
+
+const getPathFromView = (nextView) => {
+  if (nextView === 'library') return '/library';
+  if (nextView === 'studio') return '/studio';
+  return '/';
+};
+
 export default function App() {
-  const [view, setView] = useState('market'); // 'market' | 'library' | 'studio'
+  const [view, setView] = useState(() => getViewFromPath(window.location.pathname));
   const [user, setUser] = useState(null);
   const [marketItems, setMarketItems] = useState([]);
   const [userVault, setUserVault] = useState([]);
+  const [libraryItems, setLibraryItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [syncStage, setSyncStage] = useState('BIOMETRIC_AUTH');
+
+  const syncStageLabel = {
+    BIOMETRIC_AUTH: 'Confirm Face ID / Fingerprint',
+    TX_PENDING: 'Sending Direct Purchase',
+    DIRECT_SPLIT_PENDING: 'Splitting Funds Creator 99% / Treasury 1%',
+    DIRECT_SPLIT_CONFIRMED: 'Direct Split Confirmed On-Chain',
+    VERIFYING_ENTITLEMENT: 'Securing Library Access'
+  };
+
+  const navigateToView = (nextView) => {
+    setView(nextView);
+    const nextPath = getPathFromView(nextView);
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({}, '', nextPath);
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setView(getViewFromPath(window.location.pathname));
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Phase 1: Authentication & Seeding
   useEffect(() => {
@@ -115,7 +156,15 @@ export default function App() {
 
     const vaultRef = collection(db, 'artifacts', appId, 'users', user.uid, 'library');
     const unsubVault = onSnapshot(vaultRef, (snap) => {
-      setUserVault(snap.docs.map(d => d.id));
+      const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const verifiedItems = docs.filter((entry) =>
+        entry.status === 'verified' ||
+        entry.verified_entitlement === true ||
+        !!entry.onchain?.txHash
+      );
+
+      setLibraryItems(verifiedItems);
+      setUserVault(verifiedItems.map((entry) => entry.id));
     });
 
     return () => { unsubMarket(); unsubVault(); };
@@ -124,14 +173,33 @@ export default function App() {
   const acquireAsset = async (asset) => {
     if (!user || !asset || !asset.id) return;
     setIsSyncing(true);
+    setSyncStage('BIOMETRIC_AUTH');
+
     try {
-      const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'library', asset.id);
-      await setDoc(docRef, { ...asset, acquiredAt: Date.now(), status: 'verified' });
+      const purchaseResult = await purchaseAssetOnChain(asset, {
+        onStatus: (status) => {
+          setSyncStage(status);
+        }
+      });
+
+      const { getFunctions, httpsCallable } = await import('firebase/functions');
+      const functions = getFunctions();
+      const verifyPurchaseAndGrantAccess = httpsCallable(functions, 'verifyPurchaseAndGrantAccess');
+
+      setSyncStage('VERIFYING_ENTITLEMENT');
+
+      await verifyPurchaseAndGrantAccess({
+        appId,
+        assetId: asset.id,
+        txHash: purchaseResult.txHash,
+        buyerAddress: purchaseResult.buyerAddress,
+        chainId: purchaseResult.chainId
+      });
+
       setSelectedAsset(null);
-      setView('library');
+      navigateToView('library');
     } catch (e) {
       console.error('Failed to acquire asset:', e);
-      // Show user-friendly error message
       alert(`Failed to acquire asset: ${e.message || 'Unknown error occurred'}`);
     } finally {
       setIsSyncing(false);
@@ -156,19 +224,19 @@ export default function App() {
       {/* Navigation */}
       <header className="fixed top-0 w-full bg-black/60 backdrop-blur-md border-b border-white/10 z-50">
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('market')}>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigateToView('market')}>
             <Database size={24} className="text-white group-hover:rotate-12 transition-all" />
             <span className="text-3xl font-black italic tracking-tighter text-white">Sovereign</span>
           </div>
           
           <nav className="flex gap-10">
-            <button onClick={() => setView('market')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'market' ? 'text-white border-b border-indigo-500' : ''}`}>
+            <button onClick={() => navigateToView('market')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'market' ? 'text-white border-b border-indigo-500' : ''}`}>
               <ShoppingBag size={18} /> Exchange
             </button>
-            <button onClick={() => setView('library')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'library' ? 'text-white border-b border-indigo-500' : ''}`}>
+            <button onClick={() => navigateToView('library')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'library' ? 'text-white border-b border-indigo-500' : ''}`}>
               <Library size={18} /> Library
             </button>
-            <button onClick={() => setView('studio')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'studio' ? 'text-white border-b border-indigo-500' : ''}`}>
+            <button onClick={() => navigateToView('studio')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'studio' ? 'text-white border-b border-indigo-500' : ''}`}>
               <PlusSquare size={18} /> Studio
             </button>
           </nav>
@@ -193,8 +261,7 @@ export default function App() {
             />
           ) : view === 'library' ? (
             <LibraryView 
-              userVault={userVault} 
-              marketItems={marketItems} 
+              libraryItems={libraryItems}
             />
           ) : (
             <Studio 
@@ -220,15 +287,42 @@ export default function App() {
             
             <button 
               onClick={() => acquireAsset(selectedAsset)}
-              disabled={userVault.includes(selectedAsset.id)}
+              disabled={
+                userVault.includes(selectedAsset.id) ||
+                selectedAsset.onchain_content_id === undefined ||
+                selectedAsset.onchain_content_id === null ||
+                selectedAsset.price_wei === undefined ||
+                selectedAsset.price_wei === null ||
+                !selectedAsset.contract_address
+              }
               className={`w-full py-7 rounded-[2rem] font-black uppercase text-[12px] tracking-[0.3em] transition-all duration-700 shadow-2xl ${
-                userVault.includes(selectedAsset.id) 
+                userVault.includes(selectedAsset.id) ||
+                selectedAsset.onchain_content_id === undefined ||
+                selectedAsset.onchain_content_id === null ||
+                selectedAsset.price_wei === undefined ||
+                selectedAsset.price_wei === null ||
+                !selectedAsset.contract_address
                 ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed' 
                 : 'bg-indigo-600 text-white hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 shadow-indigo-600/30'
               }`}
             >
-              {userVault.includes(selectedAsset.id) ? 'Asset Verified' : `Acquire Verified Deed — $${typeof selectedAsset.price_current === 'number' && selectedAsset.price_current != null ? selectedAsset.price_current.toFixed(2) : '0.00'}`}
+              {userVault.includes(selectedAsset.id)
+                ? 'Asset Verified'
+                : (selectedAsset.onchain_content_id === undefined ||
+                  selectedAsset.onchain_content_id === null ||
+                  selectedAsset.price_wei === undefined ||
+                  selectedAsset.price_wei === null ||
+                  !selectedAsset.contract_address)
+                  ? 'Pending On-Chain Listing'
+                  : `Biometric One-Tap Direct Buy — $${typeof selectedAsset.price_current === 'number' && selectedAsset.price_current != null ? selectedAsset.price_current.toFixed(2) : '0.00'}`}
             </button>
+
+            {!userVault.includes(selectedAsset.id) && (
+              <div className="mt-4 p-4 border border-emerald-400/30 bg-emerald-500/10 rounded-2xl">
+                <p className="text-emerald-300 text-[10px] uppercase tracking-[0.25em] font-mono mb-2">Absolute Direct Split</p>
+                <p className="text-emerald-100 text-sm">Creator receives 99% instantly to wallet. Sovereign treasury receives 1% on-chain.</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -239,10 +333,14 @@ export default function App() {
           <div className="relative mb-10">
             <Loader2 className="animate-spin text-indigo-500" size={96} strokeWidth={1} />
             <div className="absolute inset-0 flex items-center justify-center">
-              <Shield size={24} className="text-indigo-400 animate-pulse" />
+              {syncStage === 'BIOMETRIC_AUTH' ? (
+                <Fingerprint size={24} className="text-indigo-400 animate-pulse" />
+              ) : (
+                <Shield size={24} className="text-indigo-400 animate-pulse" />
+              )}
             </div>
           </div>
-          <p className="text-[14px] font-black uppercase tracking-[0.8em] text-white">Validating Protocol Ledger</p>
+          <p className="text-[14px] font-black uppercase tracking-[0.5em] text-white text-center px-6">{syncStageLabel[syncStage] || 'Validating Protocol Ledger'}</p>
           <div className="mt-6 flex gap-3">
              <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
              <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>

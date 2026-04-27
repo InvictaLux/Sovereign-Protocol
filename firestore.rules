@@ -2,20 +2,63 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isCreator() {
+      return isSignedIn() && (
+        (request.resource.data.creatorAddress != null && request.resource.data.creatorAddress == request.auth.uid) ||
+        (request.resource.data.creator_address != null && request.resource.data.creator_address == request.auth.uid) ||
+        (request.resource.data.uploadedBy != null && request.resource.data.uploadedBy == request.auth.uid)
+      );
+    }
+
+    function listingLocked() {
+      return resource.data.onchain_content_id != null && resource.data.contract_address != null;
+    }
+
+    function immutableListingFields() {
+      return request.resource.data.onchain_content_id == resource.data.onchain_content_id &&
+        request.resource.data.contract_address == resource.data.contract_address &&
+        request.resource.data.chain_id == resource.data.chain_id &&
+        request.resource.data.price_wei == resource.data.price_wei &&
+        (
+          (request.resource.data.creatorAddress == null && resource.data.creatorAddress == null) ||
+          request.resource.data.creatorAddress == resource.data.creatorAddress
+        ) &&
+        (
+          (request.resource.data.creator_address == null && resource.data.creator_address == null) ||
+          request.resource.data.creator_address == resource.data.creator_address
+        );
+    }
+
     // Sovereign Pathing Logic: /artifacts/{appId}/...
     match /artifacts/{appId} {
       
       // Public Marketplace Data
-      // Anyone can read, only authenticated users (Admin/Creators) can write
+      // Anyone can read. Creator can draft before listing. Listing fields become immutable once on-chain.
+      match /public/data/marketplace_items/{docId} {
+        allow read: if true;
+        allow create: if isCreator();
+        allow update: if isCreator() && (
+          !listingLocked() || immutableListingFields()
+        );
+      }
+
       match /public/data/{collectionName}/{docId} {
         allow read: if true;
-        allow write: if request.auth != null;
+        allow write: if isSignedIn();
       }
       
       // User Private Data (The Vault)
       // Only the user who owns the account can read or write their library
       match /users/{userId}/{collectionName}/{docId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
     }
   }
