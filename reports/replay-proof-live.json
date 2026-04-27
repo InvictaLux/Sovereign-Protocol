@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-04-27T01:57:14.354Z",
+  "pass": false,
+  "error": "Missing dependency: ethers. Install dependencies before running live replay proof.",
+  "summary": {
+    "attempted": 0,
+    "passed": 0,
+    "failed": 0
+  }
+}

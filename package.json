@@ -7,12 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "replay-proof": "node scripts/replay-proof.mjs",
+    "replay-proof-live": "node scripts/replay-proof-live.mjs"
   },
   "dependencies": {
     "@lit-protocol/lit-node-client": "^6.3.0",
     "@lit-protocol/auth-helpers": "^6.3.0",
-    "@pinata/sdk": "^2.1.8",
+    "@pinata/sdk": "^2.1.0",
     "clsx": "^2.1.1",
     "ethers": "^5.7.2",
     "firebase": "^12.12.1",

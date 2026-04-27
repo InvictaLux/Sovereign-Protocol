@@ -1,0 +1,917 @@
+{
+  "generatedAt": "2026-04-27T01:50:36.208Z",
+  "protocol": "SovereignDRM",
+  "formula": {
+    "creator": "paidWei - ((paidWei * 100) / 10000)",
+    "platform": "(paidWei * 100) / 10000"
+  },
+  "totals": {
+    "replayCount": 100,
+    "passedCount": 100,
+    "failedCount": 0,
+    "passRate": "100%"
+  },
+  "pass": true,
+  "receipts": [
+    {
+      "replayIndex": 1,
+      "paidWei": "8919000000000000",
+      "creatorShareWei": "8829810000000000",
+      "platformShareWei": "89190000000000",
+      "creatorDisplay": "0.008829 ETH",
+      "platformDisplay": "0.000089 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 2,
+      "paidWei": "16838000000000000",
+      "creatorShareWei": "16669620000000000",
+      "platformShareWei": "168380000000000",
+      "creatorDisplay": "0.016669 ETH",
+      "platformDisplay": "0.000168 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 3,
+      "paidWei": "24757000000000000",
+      "creatorShareWei": "24509430000000000",
+      "platformShareWei": "247570000000000",
+      "creatorDisplay": "0.024509 ETH",
+      "platformDisplay": "0.000247 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 4,
+      "paidWei": "32676000000000000",
+      "creatorShareWei": "32349240000000000",
+      "platformShareWei": "326760000000000",
+      "creatorDisplay": "0.032349 ETH",
+      "platformDisplay": "0.000326 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 5,
+      "paidWei": "40595000000000000",
+      "creatorShareWei": "40189050000000000",
+      "platformShareWei": "405950000000000",
+      "creatorDisplay": "0.040189 ETH",
+      "platformDisplay": "0.000405 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 6,
+      "paidWei": "48514000000000000",
+      "creatorShareWei": "48028860000000000",
+      "platformShareWei": "485140000000000",
+      "creatorDisplay": "0.048028 ETH",
+      "platformDisplay": "0.000485 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 7,
+      "paidWei": "56433000000000000",
+      "creatorShareWei": "55868670000000000",
+      "platformShareWei": "564330000000000",
+      "creatorDisplay": "0.055868 ETH",
+      "platformDisplay": "0.000564 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 8,
+      "paidWei": "64352000000000000",
+      "creatorShareWei": "63708480000000000",
+      "platformShareWei": "643520000000000",
+      "creatorDisplay": "0.063708 ETH",
+      "platformDisplay": "0.000643 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 9,
+      "paidWei": "72271000000000000",
+      "creatorShareWei": "71548290000000000",
+      "platformShareWei": "722710000000000",
+      "creatorDisplay": "0.071548 ETH",
+      "platformDisplay": "0.000722 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 10,
+      "paidWei": "80190000000000000",
+      "creatorShareWei": "79388100000000000",
+      "platformShareWei": "801900000000000",
+      "creatorDisplay": "0.079388 ETH",
+      "platformDisplay": "0.000801 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 11,
+      "paidWei": "88109000000000000",
+      "creatorShareWei": "87227910000000000",
+      "platformShareWei": "881090000000000",
+      "creatorDisplay": "0.087227 ETH",
+      "platformDisplay": "0.000881 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 12,
+      "paidWei": "96028000000000000",
+      "creatorShareWei": "95067720000000000",
+      "platformShareWei": "960280000000000",
+      "creatorDisplay": "0.095067 ETH",
+      "platformDisplay": "0.000960 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 13,
+      "paidWei": "103947000000000000",
+      "creatorShareWei": "102907530000000000",
+      "platformShareWei": "1039470000000000",
+      "creatorDisplay": "0.102907 ETH",
+      "platformDisplay": "0.001039 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 14,
+      "paidWei": "111866000000000000",
+      "creatorShareWei": "110747340000000000",
+      "platformShareWei": "1118660000000000",
+      "creatorDisplay": "0.110747 ETH",
+      "platformDisplay": "0.001118 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 15,
+      "paidWei": "119785000000000000",
+      "creatorShareWei": "118587150000000000",
+      "platformShareWei": "1197850000000000",
+      "creatorDisplay": "0.118587 ETH",
+      "platformDisplay": "0.001197 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 16,
+      "paidWei": "127704000000000000",
+      "creatorShareWei": "126426960000000000",
+      "platformShareWei": "1277040000000000",
+      "creatorDisplay": "0.126426 ETH",
+      "platformDisplay": "0.001277 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 17,
+      "paidWei": "135623000000000000",
+      "creatorShareWei": "134266770000000000",
+      "platformShareWei": "1356230000000000",
+      "creatorDisplay": "0.134266 ETH",
+      "platformDisplay": "0.001356 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 18,
+      "paidWei": "143542000000000000",
+      "creatorShareWei": "142106580000000000",
+      "platformShareWei": "1435420000000000",
+      "creatorDisplay": "0.142106 ETH",
+      "platformDisplay": "0.001435 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 19,
+      "paidWei": "151461000000000000",
+      "creatorShareWei": "149946390000000000",
+      "platformShareWei": "1514610000000000",
+      "creatorDisplay": "0.149946 ETH",
+      "platformDisplay": "0.001514 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 20,
+      "paidWei": "159380000000000000",
+      "creatorShareWei": "157786200000000000",
+      "platformShareWei": "1593800000000000",
+      "creatorDisplay": "0.157786 ETH",
+      "platformDisplay": "0.001593 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 21,
+      "paidWei": "167299000000000000",
+      "creatorShareWei": "165626010000000000",
+      "platformShareWei": "1672990000000000",
+      "creatorDisplay": "0.165626 ETH",
+      "platformDisplay": "0.001672 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 22,
+      "paidWei": "175218000000000000",
+      "creatorShareWei": "173465820000000000",
+      "platformShareWei": "1752180000000000",
+      "creatorDisplay": "0.173465 ETH",
+      "platformDisplay": "0.001752 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 23,
+      "paidWei": "183137000000000000",
+      "creatorShareWei": "181305630000000000",
+      "platformShareWei": "1831370000000000",
+      "creatorDisplay": "0.181305 ETH",
+      "platformDisplay": "0.001831 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 24,
+      "paidWei": "191056000000000000",
+      "creatorShareWei": "189145440000000000",
+      "platformShareWei": "1910560000000000",
+      "creatorDisplay": "0.189145 ETH",
+      "platformDisplay": "0.001910 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 25,
+      "paidWei": "198975000000000000",
+      "creatorShareWei": "196985250000000000",
+      "platformShareWei": "1989750000000000",
+      "creatorDisplay": "0.196985 ETH",
+      "platformDisplay": "0.001989 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 26,
+      "paidWei": "206894000000000000",
+      "creatorShareWei": "204825060000000000",
+      "platformShareWei": "2068940000000000",
+      "creatorDisplay": "0.204825 ETH",
+      "platformDisplay": "0.002068 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 27,
+      "paidWei": "214813000000000000",
+      "creatorShareWei": "212664870000000000",
+      "platformShareWei": "2148130000000000",
+      "creatorDisplay": "0.212664 ETH",
+      "platformDisplay": "0.002148 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 28,
+      "paidWei": "222732000000000000",
+      "creatorShareWei": "220504680000000000",
+      "platformShareWei": "2227320000000000",
+      "creatorDisplay": "0.220504 ETH",
+      "platformDisplay": "0.002227 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 29,
+      "paidWei": "230651000000000000",
+      "creatorShareWei": "228344490000000000",
+      "platformShareWei": "2306510000000000",
+      "creatorDisplay": "0.228344 ETH",
+      "platformDisplay": "0.002306 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 30,
+      "paidWei": "238570000000000000",
+      "creatorShareWei": "236184300000000000",
+      "platformShareWei": "2385700000000000",
+      "creatorDisplay": "0.236184 ETH",
+      "platformDisplay": "0.002385 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 31,
+      "paidWei": "246489000000000000",
+      "creatorShareWei": "244024110000000000",
+      "platformShareWei": "2464890000000000",
+      "creatorDisplay": "0.244024 ETH",
+      "platformDisplay": "0.002464 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 32,
+      "paidWei": "254408000000000000",
+      "creatorShareWei": "251863920000000000",
+      "platformShareWei": "2544080000000000",
+      "creatorDisplay": "0.251863 ETH",
+      "platformDisplay": "0.002544 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 33,
+      "paidWei": "262327000000000000",
+      "creatorShareWei": "259703730000000000",
+      "platformShareWei": "2623270000000000",
+      "creatorDisplay": "0.259703 ETH",
+      "platformDisplay": "0.002623 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 34,
+      "paidWei": "270246000000000000",
+      "creatorShareWei": "267543540000000000",
+      "platformShareWei": "2702460000000000",
+      "creatorDisplay": "0.267543 ETH",
+      "platformDisplay": "0.002702 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 35,
+      "paidWei": "278165000000000000",
+      "creatorShareWei": "275383350000000000",
+      "platformShareWei": "2781650000000000",
+      "creatorDisplay": "0.275383 ETH",
+      "platformDisplay": "0.002781 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 36,
+      "paidWei": "286084000000000000",
+      "creatorShareWei": "283223160000000000",
+      "platformShareWei": "2860840000000000",
+      "creatorDisplay": "0.283223 ETH",
+      "platformDisplay": "0.002860 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 37,
+      "paidWei": "294003000000000000",
+      "creatorShareWei": "291062970000000000",
+      "platformShareWei": "2940030000000000",
+      "creatorDisplay": "0.291062 ETH",
+      "platformDisplay": "0.002940 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 38,
+      "paidWei": "301922000000000000",
+      "creatorShareWei": "298902780000000000",
+      "platformShareWei": "3019220000000000",
+      "creatorDisplay": "0.298902 ETH",
+      "platformDisplay": "0.003019 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 39,
+      "paidWei": "309841000000000000",
+      "creatorShareWei": "306742590000000000",
+      "platformShareWei": "3098410000000000",
+      "creatorDisplay": "0.306742 ETH",
+      "platformDisplay": "0.003098 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 40,
+      "paidWei": "317760000000000000",
+      "creatorShareWei": "314582400000000000",
+      "platformShareWei": "3177600000000000",
+      "creatorDisplay": "0.314582 ETH",
+      "platformDisplay": "0.003177 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 41,
+      "paidWei": "325679000000000000",
+      "creatorShareWei": "322422210000000000",
+      "platformShareWei": "3256790000000000",
+      "creatorDisplay": "0.322422 ETH",
+      "platformDisplay": "0.003256 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 42,
+      "paidWei": "333598000000000000",
+      "creatorShareWei": "330262020000000000",
+      "platformShareWei": "3335980000000000",
+      "creatorDisplay": "0.330262 ETH",
+      "platformDisplay": "0.003335 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 43,
+      "paidWei": "341517000000000000",
+      "creatorShareWei": "338101830000000000",
+      "platformShareWei": "3415170000000000",
+      "creatorDisplay": "0.338101 ETH",
+      "platformDisplay": "0.003415 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 44,
+      "paidWei": "349436000000000000",
+      "creatorShareWei": "345941640000000000",
+      "platformShareWei": "3494360000000000",
+      "creatorDisplay": "0.345941 ETH",
+      "platformDisplay": "0.003494 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 45,
+      "paidWei": "357355000000000000",
+      "creatorShareWei": "353781450000000000",
+      "platformShareWei": "3573550000000000",
+      "creatorDisplay": "0.353781 ETH",
+      "platformDisplay": "0.003573 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 46,
+      "paidWei": "365274000000000000",
+      "creatorShareWei": "361621260000000000",
+      "platformShareWei": "3652740000000000",
+      "creatorDisplay": "0.361621 ETH",
+      "platformDisplay": "0.003652 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 47,
+      "paidWei": "373193000000000000",
+      "creatorShareWei": "369461070000000000",
+      "platformShareWei": "3731930000000000",
+      "creatorDisplay": "0.369461 ETH",
+      "platformDisplay": "0.003731 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 48,
+      "paidWei": "381112000000000000",
+      "creatorShareWei": "377300880000000000",
+      "platformShareWei": "3811120000000000",
+      "creatorDisplay": "0.377300 ETH",
+      "platformDisplay": "0.003811 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 49,
+      "paidWei": "389031000000000000",
+      "creatorShareWei": "385140690000000000",
+      "platformShareWei": "3890310000000000",
+      "creatorDisplay": "0.385140 ETH",
+      "platformDisplay": "0.003890 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 50,
+      "paidWei": "396950000000000000",
+      "creatorShareWei": "392980500000000000",
+      "platformShareWei": "3969500000000000",
+      "creatorDisplay": "0.392980 ETH",
+      "platformDisplay": "0.003969 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 51,
+      "paidWei": "404869000000000000",
+      "creatorShareWei": "400820310000000000",
+      "platformShareWei": "4048690000000000",
+      "creatorDisplay": "0.400820 ETH",
+      "platformDisplay": "0.004048 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 52,
+      "paidWei": "412788000000000000",
+      "creatorShareWei": "408660120000000000",
+      "platformShareWei": "4127880000000000",
+      "creatorDisplay": "0.408660 ETH",
+      "platformDisplay": "0.004127 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 53,
+      "paidWei": "420707000000000000",
+      "creatorShareWei": "416499930000000000",
+      "platformShareWei": "4207070000000000",
+      "creatorDisplay": "0.416499 ETH",
+      "platformDisplay": "0.004207 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 54,
+      "paidWei": "428626000000000000",
+      "creatorShareWei": "424339740000000000",
+      "platformShareWei": "4286260000000000",
+      "creatorDisplay": "0.424339 ETH",
+      "platformDisplay": "0.004286 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 55,
+      "paidWei": "436545000000000000",
+      "creatorShareWei": "432179550000000000",
+      "platformShareWei": "4365450000000000",
+      "creatorDisplay": "0.432179 ETH",
+      "platformDisplay": "0.004365 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 56,
+      "paidWei": "444464000000000000",
+      "creatorShareWei": "440019360000000000",
+      "platformShareWei": "4444640000000000",
+      "creatorDisplay": "0.440019 ETH",
+      "platformDisplay": "0.004444 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 57,
+      "paidWei": "452383000000000000",
+      "creatorShareWei": "447859170000000000",
+      "platformShareWei": "4523830000000000",
+      "creatorDisplay": "0.447859 ETH",
+      "platformDisplay": "0.004523 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 58,
+      "paidWei": "460302000000000000",
+      "creatorShareWei": "455698980000000000",
+      "platformShareWei": "4603020000000000",
+      "creatorDisplay": "0.455698 ETH",
+      "platformDisplay": "0.004603 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 59,
+      "paidWei": "468221000000000000",
+      "creatorShareWei": "463538790000000000",
+      "platformShareWei": "4682210000000000",
+      "creatorDisplay": "0.463538 ETH",
+      "platformDisplay": "0.004682 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 60,
+      "paidWei": "476140000000000000",
+      "creatorShareWei": "471378600000000000",
+      "platformShareWei": "4761400000000000",
+      "creatorDisplay": "0.471378 ETH",
+      "platformDisplay": "0.004761 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 61,
+      "paidWei": "484059000000000000",
+      "creatorShareWei": "479218410000000000",
+      "platformShareWei": "4840590000000000",
+      "creatorDisplay": "0.479218 ETH",
+      "platformDisplay": "0.004840 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 62,
+      "paidWei": "491978000000000000",
+      "creatorShareWei": "487058220000000000",
+      "platformShareWei": "4919780000000000",
+      "creatorDisplay": "0.487058 ETH",
+      "platformDisplay": "0.004919 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 63,
+      "paidWei": "499897000000000000",
+      "creatorShareWei": "494898030000000000",
+      "platformShareWei": "4998970000000000",
+      "creatorDisplay": "0.494898 ETH",
+      "platformDisplay": "0.004998 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 64,
+      "paidWei": "507816000000000000",
+      "creatorShareWei": "502737840000000000",
+      "platformShareWei": "5078160000000000",
+      "creatorDisplay": "0.502737 ETH",
+      "platformDisplay": "0.005078 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 65,
+      "paidWei": "515735000000000000",
+      "creatorShareWei": "510577650000000000",
+      "platformShareWei": "5157350000000000",
+      "creatorDisplay": "0.510577 ETH",
+      "platformDisplay": "0.005157 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 66,
+      "paidWei": "523654000000000000",
+      "creatorShareWei": "518417460000000000",
+      "platformShareWei": "5236540000000000",
+      "creatorDisplay": "0.518417 ETH",
+      "platformDisplay": "0.005236 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 67,
+      "paidWei": "531573000000000000",
+      "creatorShareWei": "526257270000000000",
+      "platformShareWei": "5315730000000000",
+      "creatorDisplay": "0.526257 ETH",
+      "platformDisplay": "0.005315 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 68,
+      "paidWei": "539492000000000000",
+      "creatorShareWei": "534097080000000000",
+      "platformShareWei": "5394920000000000",
+      "creatorDisplay": "0.534097 ETH",
+      "platformDisplay": "0.005394 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 69,
+      "paidWei": "547411000000000000",
+      "creatorShareWei": "541936890000000000",
+      "platformShareWei": "5474110000000000",
+      "creatorDisplay": "0.541936 ETH",
+      "platformDisplay": "0.005474 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 70,
+      "paidWei": "555330000000000000",
+      "creatorShareWei": "549776700000000000",
+      "platformShareWei": "5553300000000000",
+      "creatorDisplay": "0.549776 ETH",
+      "platformDisplay": "0.005553 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 71,
+      "paidWei": "563249000000000000",
+      "creatorShareWei": "557616510000000000",
+      "platformShareWei": "5632490000000000",
+      "creatorDisplay": "0.557616 ETH",
+      "platformDisplay": "0.005632 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 72,
+      "paidWei": "571168000000000000",
+      "creatorShareWei": "565456320000000000",
+      "platformShareWei": "5711680000000000",
+      "creatorDisplay": "0.565456 ETH",
+      "platformDisplay": "0.005711 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 73,
+      "paidWei": "579087000000000000",
+      "creatorShareWei": "573296130000000000",
+      "platformShareWei": "5790870000000000",
+      "creatorDisplay": "0.573296 ETH",
+      "platformDisplay": "0.005790 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 74,
+      "paidWei": "587006000000000000",
+      "creatorShareWei": "581135940000000000",
+      "platformShareWei": "5870060000000000",
+      "creatorDisplay": "0.581135 ETH",
+      "platformDisplay": "0.005870 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 75,
+      "paidWei": "594925000000000000",
+      "creatorShareWei": "588975750000000000",
+      "platformShareWei": "5949250000000000",
+      "creatorDisplay": "0.588975 ETH",
+      "platformDisplay": "0.005949 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 76,
+      "paidWei": "602844000000000000",
+      "creatorShareWei": "596815560000000000",
+      "platformShareWei": "6028440000000000",
+      "creatorDisplay": "0.596815 ETH",
+      "platformDisplay": "0.006028 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 77,
+      "paidWei": "610763000000000000",
+      "creatorShareWei": "604655370000000000",
+      "platformShareWei": "6107630000000000",
+      "creatorDisplay": "0.604655 ETH",
+      "platformDisplay": "0.006107 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 78,
+      "paidWei": "618682000000000000",
+      "creatorShareWei": "612495180000000000",
+      "platformShareWei": "6186820000000000",
+      "creatorDisplay": "0.612495 ETH",
+      "platformDisplay": "0.006186 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 79,
+      "paidWei": "626601000000000000",
+      "creatorShareWei": "620334990000000000",
+      "platformShareWei": "6266010000000000",
+      "creatorDisplay": "0.620334 ETH",
+      "platformDisplay": "0.006266 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 80,
+      "paidWei": "634520000000000000",
+      "creatorShareWei": "628174800000000000",
+      "platformShareWei": "6345200000000000",
+      "creatorDisplay": "0.628174 ETH",
+      "platformDisplay": "0.006345 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 81,
+      "paidWei": "642439000000000000",
+      "creatorShareWei": "636014610000000000",
+      "platformShareWei": "6424390000000000",
+      "creatorDisplay": "0.636014 ETH",
+      "platformDisplay": "0.006424 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 82,
+      "paidWei": "650358000000000000",
+      "creatorShareWei": "643854420000000000",
+      "platformShareWei": "6503580000000000",
+      "creatorDisplay": "0.643854 ETH",
+      "platformDisplay": "0.006503 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 83,
+      "paidWei": "658277000000000000",
+      "creatorShareWei": "651694230000000000",
+      "platformShareWei": "6582770000000000",
+      "creatorDisplay": "0.651694 ETH",
+      "platformDisplay": "0.006582 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 84,
+      "paidWei": "666196000000000000",
+      "creatorShareWei": "659534040000000000",
+      "platformShareWei": "6661960000000000",
+      "creatorDisplay": "0.659534 ETH",
+      "platformDisplay": "0.006661 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 85,
+      "paidWei": "674115000000000000",
+      "creatorShareWei": "667373850000000000",
+      "platformShareWei": "6741150000000000",
+      "creatorDisplay": "0.667373 ETH",
+      "platformDisplay": "0.006741 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 86,
+      "paidWei": "682034000000000000",
+      "creatorShareWei": "675213660000000000",
+      "platformShareWei": "6820340000000000",
+      "creatorDisplay": "0.675213 ETH",
+      "platformDisplay": "0.006820 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 87,
+      "paidWei": "689953000000000000",
+      "creatorShareWei": "683053470000000000",
+      "platformShareWei": "6899530000000000",
+      "creatorDisplay": "0.683053 ETH",
+      "platformDisplay": "0.006899 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 88,
+      "paidWei": "697872000000000000",
+      "creatorShareWei": "690893280000000000",
+      "platformShareWei": "6978720000000000",
+      "creatorDisplay": "0.690893 ETH",
+      "platformDisplay": "0.006978 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 89,
+      "paidWei": "705791000000000000",
+      "creatorShareWei": "698733090000000000",
+      "platformShareWei": "7057910000000000",
+      "creatorDisplay": "0.698733 ETH",
+      "platformDisplay": "0.007057 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 90,
+      "paidWei": "713710000000000000",
+      "creatorShareWei": "706572900000000000",
+      "platformShareWei": "7137100000000000",
+      "creatorDisplay": "0.706572 ETH",
+      "platformDisplay": "0.007137 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 91,
+      "paidWei": "721629000000000000",
+      "creatorShareWei": "714412710000000000",
+      "platformShareWei": "7216290000000000",
+      "creatorDisplay": "0.714412 ETH",
+      "platformDisplay": "0.007216 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 92,
+      "paidWei": "729548000000000000",
+      "creatorShareWei": "722252520000000000",
+      "platformShareWei": "7295480000000000",
+      "creatorDisplay": "0.722252 ETH",
+      "platformDisplay": "0.007295 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 93,
+      "paidWei": "737467000000000000",
+      "creatorShareWei": "730092330000000000",
+      "platformShareWei": "7374670000000000",
+      "creatorDisplay": "0.730092 ETH",
+      "platformDisplay": "0.007374 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 94,
+      "paidWei": "745386000000000000",
+      "creatorShareWei": "737932140000000000",
+      "platformShareWei": "7453860000000000",
+      "creatorDisplay": "0.737932 ETH",
+      "platformDisplay": "0.007453 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 95,
+      "paidWei": "753305000000000000",
+      "creatorShareWei": "745771950000000000",
+      "platformShareWei": "7533050000000000",
+      "creatorDisplay": "0.745771 ETH",
+      "platformDisplay": "0.007533 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 96,
+      "paidWei": "761224000000000000",
+      "creatorShareWei": "753611760000000000",
+      "platformShareWei": "7612240000000000",
+      "creatorDisplay": "0.753611 ETH",
+      "platformDisplay": "0.007612 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 97,
+      "paidWei": "769143000000000000",
+      "creatorShareWei": "761451570000000000",
+      "platformShareWei": "7691430000000000",
+      "creatorDisplay": "0.761451 ETH",
+      "platformDisplay": "0.007691 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 98,
+      "paidWei": "777062000000000000",
+      "creatorShareWei": "769291380000000000",
+      "platformShareWei": "7770620000000000",
+      "creatorDisplay": "0.769291 ETH",
+      "platformDisplay": "0.007770 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 99,
+      "paidWei": "784981000000000000",
+      "creatorShareWei": "777131190000000000",
+      "platformShareWei": "7849810000000000",
+      "creatorDisplay": "0.777131 ETH",
+      "platformDisplay": "0.007849 ETH",
+      "passed": true
+    },
+    {
+      "replayIndex": 100,
+      "paidWei": "792900000000000000",
+      "creatorShareWei": "784971000000000000",
+      "platformShareWei": "7929000000000000",
+      "creatorDisplay": "0.784971 ETH",
+      "platformDisplay": "0.007929 ETH",
+      "passed": true
+    }
+  ]
+}

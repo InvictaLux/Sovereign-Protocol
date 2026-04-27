@@ -611,7 +611,7 @@ export default function Studio({ user, auth }) {
       const signerAddress = walletAddress || (await connectWallet()).address;
       const accessControlConditions = getAccessControlConditions(signerAddress);
 
-      setProcessingStage('GENERATING ENCRYPTION KEY...');
+      setProcessingStage('GENERATING SECURE KEY...');
       setProcessingProgress(8);
       const symmetricCryptoKey = await crypto.subtle.generateKey(
         { name: 'AES-GCM', length: 256 },
@@ -626,7 +626,7 @@ export default function Studio({ user, auth }) {
         throw new Error('LIT Protocol encryption failed - cannot proceed');
       }
 
-      setProcessingStage('ENCRYPTING MEDIA STREAM...');
+      setProcessingStage('FORGING PERMANENT RIGHTS...');
       addTerminalLog('PIPELINE_ARMED');
       abortControllerRef.current = new AbortController();
 
@@ -688,7 +688,7 @@ export default function Studio({ user, auth }) {
       
       setProcessingSuccess(true);
       setProcessingProgress(100);
-      setProcessingStage('UPLOAD COMPLETE - READY FOR ON-CHAIN LISTING');
+      setProcessingStage('FORGING COMPLETE - READY FOR ON-CHAIN LISTING');
 
       addTerminalLog(`ASSET_LISTED_${ipfsHash}`);
       console.log('Asset processed successfully:', ipfsHash);
