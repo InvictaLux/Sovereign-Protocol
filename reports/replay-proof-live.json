@@ -1,10 +1,22 @@
 {
-  "generatedAt": "2026-04-27T01:57:14.354Z",
+  "generatedAt": "2026-04-27T02:05:06.761Z",
+  "network": null,
+  "runCount": 100,
+  "contractAddress": null,
+  "walletAddress": null,
   "pass": false,
-  "error": "Missing dependency: ethers. Install dependencies before running live replay proof.",
   "summary": {
     "attempted": 0,
     "passed": 0,
     "failed": 0
-  }
+  },
+  "environment": {
+    "missing": [
+      "REPLAY_RPC_URL",
+      "REPLAY_PRIVATE_KEY",
+      "REPLAY_CONTRACT_ADDRESS"
+    ]
+  },
+  "txs": [],
+  "error": "Missing required environment variables: REPLAY_RPC_URL, REPLAY_PRIVATE_KEY, REPLAY_CONTRACT_ADDRESS"
 }
