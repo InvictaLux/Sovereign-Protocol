@@ -718,7 +718,7 @@ export default function Studio({ user, auth }) {
           <p className="text-zinc-500 max-w-lg font-medium font-mono text-sm">Sign in to access the creator studio and upload your digital assets.</p>
         </div>
         
-        <div className="max-w-md mx-auto bg-zinc-900/50 p-12 rounded-[3.5rem] border border-white/5 text-center">
+        <div className="max-w-md mx-auto bg-zinc-900/50 p-6 sm:p-12 rounded-[2rem] sm:rounded-[3.5rem] border border-white/5 text-center">
           <UploadCloud size={64} className="mx-auto text-indigo-400 mb-6" />
           <p className="text-zinc-400 mb-8">Authentication required to access creator tools</p>
           <button
@@ -753,12 +753,12 @@ export default function Studio({ user, auth }) {
           ) : (
             <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
               {recentSales.map((sale) => (
-                <div key={sale.id} className="flex items-center justify-between gap-3 bg-black/40 border border-white/5 rounded-xl p-3">
+                <div key={sale.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/40 border border-white/5 rounded-xl p-3">
                   <div>
                     <p className="text-white text-sm font-semibold leading-tight">{sale.title || 'Untitled Asset'}</p>
                     <p className="text-zinc-500 text-xs font-mono">+{weiToEthDisplay(sale.creatorShareWei)} ETH</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <span className="inline-block px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black tracking-widest">DIRECT</span>
                     <a
                       href={sale.explorerUrl || '#'}
@@ -780,7 +780,7 @@ export default function Studio({ user, auth }) {
         {/* Upload Zone */}
         <div
           className={
-            "relative border-2 border-dashed rounded-[3.5rem] p-16 text-center transition-all duration-300 " +
+            "relative border-2 border-dashed rounded-[2rem] sm:rounded-[3.5rem] p-6 sm:p-16 text-center transition-all duration-300 " +
             (isDragging 
               ? 'border-indigo-500 bg-indigo-500/10 scale-[1.02]' 
               : 'border-white/10 bg-zinc-900/30 hover:border-white/20 hover:bg-zinc-900/50')
@@ -825,14 +825,14 @@ export default function Studio({ user, auth }) {
 
         {/* Selected File Preview & Processing */}
         {selectedFile && (
-          <div className="mt-8 bg-zinc-900/30 p-8 rounded-[3.5rem] border border-white/5">
+          <div className="mt-8 bg-zinc-900/30 p-5 sm:p-8 rounded-[2rem] sm:rounded-[3.5rem] border border-white/5">
             {!isProcessing ? (
               <div className="space-y-6">
-                <div className="flex items-center gap-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                   <div className="p-4 bg-indigo-500/20 rounded-2xl text-indigo-400">
                     {getFileIcon(selectedFile.name)}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <h4 className="text-xl font-bold text-white mb-2">{selectedFile.name}</h4>
                     <p className="text-zinc-500">{formatFileSize(selectedFile.size)}</p>
                   </div>
@@ -844,7 +844,7 @@ export default function Studio({ user, auth }) {
                       setUploadedAssetRecord(null);
                       setTerminalLog([]);
                     }}
-                    className="px-6 py-3 bg-red-500/20 text-red-400 rounded-2xl hover:bg-red-500/30 transition-colors"
+                    className="w-full sm:w-auto px-6 py-3 bg-red-500/20 text-red-400 rounded-2xl hover:bg-red-500/30 transition-colors"
                   >
                     Remove
                   </button>
@@ -881,7 +881,7 @@ export default function Studio({ user, auth }) {
                   </div>
                 )}
 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <button
                     onClick={processFile}
                     disabled={isProcessing || isListingOnChain || !selectedFile}
@@ -983,7 +983,7 @@ export default function Studio({ user, auth }) {
                     </div>
                   )}
                   
-                  <div className="flex gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <button
                       onClick={processFile}
                       disabled={isProcessing || !selectedFile}

@@ -65,12 +65,12 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
 
   return (
     <section className="animate-in fade-in slide-in-from-bottom-6 duration-1000">
-      <div className="mb-16">
+      <div className="mb-12 sm:mb-16">
         <div className="flex items-center gap-2 mb-4 text-indigo-300">
           <Sparkles size={16} />
           <p className="text-[10px] uppercase tracking-[0.35em] font-mono">Discovery Gallery</p>
         </div>
-        <h1 className="text-6xl font-black tracking-tighter italic uppercase mb-4">Popular</h1>
+        <h1 className="text-4xl sm:text-6xl font-black tracking-tighter italic uppercase mb-4">Popular</h1>
         <p className="text-zinc-500 max-w-lg font-medium">Discover sovereign releases, trending creators, and direct-buy titles.</p>
       </div>
 
@@ -81,7 +81,7 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
               type="button"
               onClick={() => setActiveFilter('all')}
               whileTap={{ scale: 0.96 }}
-              className={`px-4 py-2 rounded-full text-xs uppercase tracking-[0.22em] border transition ${activeFilter === 'all' ? 'bg-white text-black border-white' : 'bg-black/40 border-white/20 text-zinc-300 hover:border-white/40'}`}
+              className={`min-h-11 px-4 py-2 rounded-full text-xs uppercase tracking-[0.22em] border transition ${activeFilter === 'all' ? 'bg-white text-black border-white' : 'bg-black/40 border-white/20 text-zinc-300 hover:border-white/40'}`}
             >
               All
             </motion.button>
@@ -91,7 +91,7 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
                 type="button"
                 onClick={() => setActiveFilter(chip.key)}
                 whileTap={{ scale: 0.96 }}
-                className={`px-4 py-2 rounded-full text-xs uppercase tracking-[0.22em] border transition ${activeFilter === chip.key ? 'bg-indigo-500/90 text-white border-indigo-300/60 shadow-[0_0_20px_rgba(99,102,241,0.35)]' : 'bg-black/40 border-white/20 text-zinc-300 hover:border-white/40'}`}
+                className={`min-h-11 px-4 py-2 rounded-full text-xs uppercase tracking-[0.22em] border transition ${activeFilter === chip.key ? 'bg-indigo-500/90 text-white border-indigo-300/60 shadow-[0_0_20px_rgba(99,102,241,0.35)]' : 'bg-black/40 border-white/20 text-zinc-300 hover:border-white/40'}`}
               >
                 {chip.label}
               </motion.button>
@@ -102,9 +102,9 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
         <section>
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-xl font-black tracking-tight">New Releases</h2>
-            <p className="text-zinc-500 text-xs uppercase tracking-[0.25em] font-mono">Swipe</p>
+            <p className="text-zinc-500 text-xs uppercase tracking-[0.25em] font-mono">Latest Drops</p>
           </div>
-          <div className="flex gap-5 overflow-x-auto pb-2 snap-x snap-mandatory">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <AnimatePresence mode="popLayout">
               {newReleases.map((item) => (
                 <motion.button
@@ -112,7 +112,7 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
                   layout
                   layoutId={`asset-card-${item.id}`}
                   onClick={() => setSelectedAsset(item)}
-                  className="min-w-[15rem] sm:min-w-[18rem] snap-start text-left"
+                  className="w-full text-left"
                   whileHover={{ y: -4 }}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -122,7 +122,7 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
                     <img src={item.thumbnail_url || fallbackImage} alt={item.title || 'release'} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
                     <div className="absolute bottom-3 left-3 right-3">
-                      <p className="text-white font-bold text-lg leading-tight">{item.title || 'Untitled Asset'}</p>
+                      <p className="text-white font-bold text-lg leading-tight line-clamp-2">{item.title || 'Untitled Asset'}</p>
                       <p className="text-zinc-300 text-[10px] uppercase tracking-[0.22em] mt-1">{item.artist_name || 'Sovereign Creator'}</p>
                     </div>
                   </div>
@@ -160,7 +160,7 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
             <div className="flex items-center gap-2 text-orange-300 text-xs uppercase tracking-[0.25em] font-mono"><Flame size={14} /> High Traffic</div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
             <AnimatePresence mode="popLayout">
               {trendingNow.map((item) => (
                 <motion.article
@@ -196,7 +196,7 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
                     <button
                       onClick={() => onDirectBuy?.(item)}
                       disabled={userVault.includes(item.id)}
-                      className="mt-4 w-full py-2 rounded-xl border border-indigo-400/40 text-indigo-200 text-xs uppercase tracking-[0.22em] hover:bg-indigo-500 hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="mt-4 w-full min-h-11 py-2 rounded-xl border border-indigo-400/40 text-indigo-200 text-xs uppercase tracking-[0.22em] hover:bg-indigo-500 hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {userVault.includes(item.id) ? 'Owned' : 'Direct Buy'}
                     </button>

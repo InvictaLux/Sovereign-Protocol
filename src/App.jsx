@@ -1,5 +1,13 @@
-import { useState, useEffect, Suspense, lazy, useMemo } from 'react';
-import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
+import { useState, useEffect, Suspense, lazy, useMemo, useRef } from 'react';
+import {
+  GoogleAuthProvider,
+  OAuthProvider,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  signInWithEmailAndPassword,
+  signInWithPopup
+} from 'firebase/auth';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { 
   Zap, 
@@ -12,7 +20,9 @@ import {
   PlusSquare,
   Fingerprint,
   Verified,
-  Sparkles
+  Sparkles,
+  User,
+  Mail
 } from 'lucide-react';
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import { auth, db, appId } from './firebase';
@@ -41,7 +51,12 @@ const getPathFromView = (nextView) => {
 
 export default function App() {
   const identityWords = ['Forge.', 'Own.', 'Sovereign.'];
+  const motionEase = [0.22, 1, 0.36, 1];
+  const transitionFast = { duration: 0.2, ease: motionEase };
+  const transitionBase = { duration: 0.24, ease: motionEase };
+  const transitionCurtain = { duration: 0.42, ease: motionEase };
   const [view, setView] = useState(() => getViewFromPath(window.location.pathname));
+  const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
   const [user, setUser] = useState(null);
   const [marketItems, setMarketItems] = useState([]);
   const [userVault, setUserVault] = useState([]);
@@ -54,6 +69,18 @@ export default function App() {
   const [showProtocolStatus, setShowProtocolStatus] = useState(false);
   const [showIdentitySequence, setShowIdentitySequence] = useState(false);
   const [identityWordIndex, setIdentityWordIndex] = useState(0);
+  const [walletAddress, setWalletAddress] = useState('');
+  const [isWalletConnecting, setIsWalletConnecting] = useState(false);
+  const [showAuthSheet, setShowAuthSheet] = useState(false);
+  const [authMode, setAuthMode] = useState('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const authSheetPanelRef = useRef(null);
+  const profileMenuRef = useRef(null);
+  const profileButtonRef = useRef(null);
 
   const syncStageLabel = {
     BIOMETRIC_AUTH: 'Confirm Face ID / Fingerprint',
@@ -96,17 +123,133 @@ export default function App() {
     setShowIdentitySequence(false);
   };
 
-  const startSecureSignIn = async () => {
+  const requestWalletHandshake = async () => {
+    if (!window.ethereum) {
+      return null;
+    }
+
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const address = Array.isArray(accounts) && accounts[0] ? accounts[0] : null;
+    if (address) {
+      setWalletAddress(address);
+    }
+    return address;
+  };
+
+  const runPostAuthSequence = async () => {
     try {
       await runIdentitySequence();
-      await signInAnonymously(auth);
     } catch (error) {
-      console.error('Secure sign-in failed:', error);
+      console.error('Post-auth sequence failed:', error);
       setShowIdentitySequence(false);
     }
   };
 
+  const handleProviderAuth = async (providerKey) => {
+    if (isAuthSubmitting) return;
+
+    setIsAuthSubmitting(true);
+    setAuthError('');
+
+    try {
+      if (providerKey === 'google') {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      } else {
+        const provider = new OAuthProvider('apple.com');
+        provider.addScope('email');
+        provider.addScope('name');
+        await signInWithPopup(auth, provider);
+      }
+
+      setShowAuthSheet(false);
+      await runPostAuthSequence();
+    } catch (error) {
+      console.error('Provider auth failed:', error);
+      setAuthError(error?.message || 'Sign-in failed. Try a different method.');
+    } finally {
+      setIsAuthSubmitting(false);
+    }
+  };
+
+  const handleEmailAuth = async (event) => {
+    event.preventDefault();
+    if (isAuthSubmitting) return;
+
+    if (!email || !password) {
+      setAuthError('Enter both email and password.');
+      return;
+    }
+
+    setIsAuthSubmitting(true);
+    setAuthError('');
+
+    try {
+      if (authMode === 'signup') {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+
+      setShowAuthSheet(false);
+      await runPostAuthSequence();
+    } catch (error) {
+      console.error('Email auth failed:', error);
+      setAuthError(error?.message || 'Email sign-in failed.');
+    } finally {
+      setIsAuthSubmitting(false);
+    }
+  };
+
+  const handleConnect = async () => {
+    if (!user) {
+      setAuthError('');
+      setShowAuthSheet(true);
+      setShowProfileMenu(false);
+      return;
+    }
+
+    if (isWalletConnecting || walletAddress) return;
+
+    setIsWalletConnecting(true);
+    try {
+      const connectedWallet = await requestWalletHandshake();
+      if (!connectedWallet && window.ethereum) {
+        alert('No wallet detected. Install MetaMask to connect.');
+      }
+    } catch (error) {
+      if (error?.code === 4001) {
+        return;
+      }
+
+      console.error('Wallet connect failed:', error);
+      alert(error?.message || 'Wallet connection failed.');
+    } finally {
+      setIsWalletConnecting(false);
+    }
+  };
+
+  const walletDisplay = walletAddress
+    ? `${walletAddress.slice(0, 6)}…${walletAddress.slice(-4)}`
+    : user?.email
+      ? user.email
+      : user
+        ? `UID ${user.uid.slice(0, 6)}…`
+        : 'Connect';
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setShowProfileMenu(false);
+      setWalletAddress('');
+    } catch (error) {
+      console.error('Sign out failed:', error);
+      alert(error?.message || 'Unable to sign out right now.');
+    }
+  };
+
   const navigateToView = (nextView) => {
+    setShowProfileMenu(false);
     setView(nextView);
     const nextPath = getPathFromView(nextView);
     if (window.location.pathname !== nextPath) {
@@ -122,6 +265,85 @@ export default function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  useEffect(() => {
+    const onResize = () => {
+      setViewportWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
+    if (!showAuthSheet && !showProfileMenu) return;
+
+    const onKeyDown = (event) => {
+      if (event.key !== 'Escape') return;
+      if (showAuthSheet) {
+        setShowAuthSheet(false);
+      }
+      if (showProfileMenu) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    const onPointerDown = (event) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+
+      if (showAuthSheet && authSheetPanelRef.current && !authSheetPanelRef.current.contains(target)) {
+        setShowAuthSheet(false);
+      }
+
+      if (
+        showProfileMenu &&
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(target) &&
+        !(profileButtonRef.current && profileButtonRef.current.contains(target))
+      ) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('pointerdown', onPointerDown);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('pointerdown', onPointerDown);
+    };
+  }, [showAuthSheet, showProfileMenu]);
+
+  useEffect(() => {
+    if (!window.ethereum) return;
+
+    let isMounted = true;
+
+    const syncWallet = async () => {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (!isMounted) return;
+        const address = Array.isArray(accounts) && accounts[0] ? accounts[0] : '';
+        setWalletAddress(address);
+      } catch (error) {
+        console.error('Wallet account sync failed:', error);
+      }
+    };
+
+    const onAccountsChanged = (accounts) => {
+      const address = Array.isArray(accounts) && accounts[0] ? accounts[0] : '';
+      setWalletAddress(address);
+    };
+
+    syncWallet();
+    window.ethereum.on?.('accountsChanged', onAccountsChanged);
+
+    return () => {
+      isMounted = false;
+      window.ethereum.removeListener?.('accountsChanged', onAccountsChanged);
+    };
+  }, [user]);
 
   // Phase 1: Authentication & Seeding
   useEffect(() => {
@@ -259,31 +481,53 @@ export default function App() {
       <div className="min-h-screen bg-[#020202] text-white selection:bg-indigo-500/40 font-sans">
       {/* Navigation */}
       <header className="fixed top-0 w-full bg-black/60 backdrop-blur-md border-b border-white/10 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigateToView('market')}>
             <Database size={24} className="text-white group-hover:rotate-12 transition-all" />
-            <span className="text-3xl font-black italic tracking-tighter text-white">Sovereign</span>
+            <span className="text-2xl sm:text-3xl font-black italic tracking-tighter text-white">Sovereign</span>
           </div>
-          
-          <nav className="flex gap-10">
-            <button onClick={() => navigateToView('market')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'market' ? 'text-white border-b border-indigo-500' : ''}`}>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleConnect}
+              className="min-h-11 border border-white/20 px-3 sm:px-4 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-500 shadow-[0_10px_24px_rgba(0,0,0,0.35)] font-bold text-[10px] sm:text-xs tracking-[0.16em] uppercase"
+            >
+              {isWalletConnecting ? 'Connecting' : walletDisplay}
+            </button>
+            <button
+              ref={profileButtonRef}
+              onClick={() => {
+                if (!user) {
+                  setAuthError('');
+                  setShowAuthSheet(true);
+                  return;
+                }
+                setShowProfileMenu((prev) => !prev);
+              }}
+              className="w-11 h-11 rounded-full border border-white/20 bg-black/40 hover:bg-white hover:text-black transition flex items-center justify-center"
+            >
+              <User size={16} />
+            </button>
+          </div>
+        </div>
+
+        <div className="hidden md:block border-t border-white/5">
+          <nav className="max-w-6xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-4 lg:gap-6">
+            <button onClick={() => navigateToView('market')} className={`min-h-11 flex items-center gap-2 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'market' ? 'text-white border-b border-indigo-500' : ''}`}>
               <ShoppingBag size={18} /> Exchange
             </button>
-            <button onClick={() => navigateToView('library')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'library' ? 'text-white border-b border-indigo-500' : ''}`}>
+            <button onClick={() => navigateToView('library')} className={`min-h-11 flex items-center gap-2 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'library' ? 'text-white border-b border-indigo-500' : ''}`}>
               <Library size={18} /> Library
             </button>
-            <button onClick={() => navigateToView('studio')} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'studio' ? 'text-white border-b border-indigo-500' : ''}`}>
+            <button onClick={() => navigateToView('studio')} className={`min-h-11 flex items-center gap-2 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'studio' ? 'text-white border-b border-indigo-500' : ''}`}>
               <PlusSquare size={18} /> Studio
             </button>
           </nav>
-          <button className="border border-white/20 px-6 py-2 rounded-2xl hover:bg-white hover:text-black transition-all duration-500 shadow-[0_10px_24px_rgba(0,0,0,0.35)] font-bold uppercase text-[10px] tracking-[0.2em]">
-            Connect
-          </button>
         </div>
       </header>
 
       {/* Viewport */}
-      <main className="max-w-6xl mx-auto px-6 pt-32 pb-40">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-28 md:pt-36 pb-32 md:pb-40">
         <Suspense fallback={
           <div className="flex items-center justify-center py-48">
             <Loader2 className="animate-spin text-indigo-500" size={48} />
@@ -358,21 +602,38 @@ export default function App() {
 
       {!user && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] w-[92%] max-w-lg rounded-[1.6rem] border border-indigo-400/30 bg-[#090909]/95 backdrop-blur-md p-4 sm:p-5">
-          <div className="flex items-start gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-3">
             <Sparkles size={18} className="text-indigo-300 mt-1" />
-            <div>
+            <div className="sm:flex-1 min-w-0">
               <p className="text-white font-semibold">Sign in to Secure Your Rights</p>
               <p className="text-zinc-400 text-sm mt-1">Email, Apple, or Google creates your secure protocol wallet in the background.</p>
             </div>
             <button
-              onClick={startSecureSignIn}
-              className="ml-auto px-3 py-2 rounded-lg border border-indigo-400/40 text-indigo-200 text-[10px] uppercase tracking-[0.2em] hover:bg-indigo-500 hover:text-white transition"
+              onClick={handleConnect}
+              className="w-full sm:w-auto min-h-11 sm:ml-auto px-3 py-2 rounded-lg border border-indigo-400/40 text-indigo-200 text-[10px] uppercase tracking-[0.2em] hover:bg-indigo-500 hover:text-white transition"
             >
               Continue
             </button>
           </div>
         </div>
       )}
+
+      <div className="md:hidden fixed inset-x-0 bottom-0 z-[140] border-t border-white/10 bg-black/90 backdrop-blur-xl">
+        <nav className="grid grid-cols-3">
+          <button onClick={() => navigateToView('market')} className={`min-h-14 flex flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-[0.15em] ${view === 'market' ? 'text-white' : 'text-zinc-500'}`}>
+            <ShoppingBag size={16} />
+            Exchange
+          </button>
+          <button onClick={() => navigateToView('library')} className={`min-h-14 flex flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-[0.15em] ${view === 'library' ? 'text-white' : 'text-zinc-500'}`}>
+            <Library size={16} />
+            Library
+          </button>
+          <button onClick={() => navigateToView('studio')} className={`min-h-14 flex flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-[0.15em] ${view === 'studio' ? 'text-white' : 'text-zinc-500'}`}>
+            <PlusSquare size={16} />
+            Studio
+          </button>
+        </nav>
+      </div>
 
       <button
         onClick={() => setShowProtocolStatus((prev) => !prev)}
@@ -388,6 +649,7 @@ export default function App() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
+            transition={transitionBase}
             className="fixed right-4 bottom-16 z-[130] w-[22rem] max-w-[calc(100vw-2rem)] rounded-2xl border border-emerald-400/30 bg-black/90 p-4 font-mono text-xs shadow-[0_0_30px_rgba(16,185,129,0.15)]"
           >
             <p className="text-emerald-300 uppercase tracking-[0.22em] mb-3">Protocol Status</p>
@@ -400,19 +662,157 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
+        {showProfileMenu && user && (
+          <>
+            <motion.div
+              initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+              animate={{ opacity: 1, backdropFilter: 'blur(2px)' }}
+              exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+              transition={transitionFast}
+              className="fixed inset-0 z-[204] bg-black/25"
+              aria-hidden="true"
+            />
+            <motion.div
+              ref={profileMenuRef}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={transitionFast}
+              className="fixed right-4 sm:right-6 top-16 sm:top-20 z-[205] w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-white/10 bg-black/90 backdrop-blur-xl p-4 shadow-2xl"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-indigo-500/30 border border-indigo-300/40 flex items-center justify-center text-xs font-black uppercase">
+                  {(user.email || walletAddress || user.uid || 'S').slice(0, 1)}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white text-sm font-semibold truncate">{user.email || 'Sovereign Member'}</p>
+                  <p className="text-zinc-500 text-xs truncate">{walletAddress || `UID ${user.uid}`}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                {!walletAddress && window.ethereum && (
+                  <button
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      handleConnect();
+                    }}
+                    className="w-full min-h-11 rounded-xl border border-indigo-400/40 text-indigo-200 hover:bg-indigo-500 hover:text-white transition text-xs uppercase tracking-[0.15em]"
+                  >
+                    Connect Wallet
+                  </button>
+                )}
+                <button
+                  onClick={handleSignOut}
+                  className="w-full min-h-11 rounded-xl border border-white/15 text-zinc-300 hover:bg-white hover:text-black transition text-xs uppercase tracking-[0.15em]"
+                >
+                  Sign Out
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showAuthSheet && (
+          <motion.div
+            initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+            animate={{ opacity: 1, backdropFilter: 'blur(8px)' }}
+            exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+            transition={transitionBase}
+            className="fixed inset-0 z-[220] bg-black/75 flex items-center justify-center p-4"
+          >
+            <motion.div
+              ref={authSheetPanelRef}
+              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={transitionBase}
+              className="w-full max-w-md rounded-[2rem] border border-white/10 bg-[#0a0a0a] p-5 sm:p-7 shadow-2xl"
+            >
+              <p className="text-white text-xl font-black tracking-tight">Sign in to Secure Your Rights</p>
+              <p className="text-zinc-400 text-sm mt-2">Choose how you want to enter Sovereign.</p>
+
+              <div className="mt-5 space-y-3">
+                <button
+                  onClick={() => handleProviderAuth('google')}
+                  disabled={isAuthSubmitting}
+                  className="w-full min-h-11 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition text-sm font-semibold"
+                >
+                  Continue with Google
+                </button>
+                <button
+                  onClick={() => handleProviderAuth('apple')}
+                  disabled={isAuthSubmitting}
+                  className="w-full min-h-11 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition text-sm font-semibold"
+                >
+                  Continue with Apple
+                </button>
+              </div>
+
+              <div className="my-5 flex items-center gap-3 text-zinc-500 text-xs uppercase tracking-[0.2em]">
+                <div className="h-px bg-white/10 flex-1" />
+                <span>Email</span>
+                <div className="h-px bg-white/10 flex-1" />
+              </div>
+
+              <form onSubmit={handleEmailAuth} className="space-y-3">
+                <div className="relative">
+                  <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full min-h-11 bg-zinc-950 border border-white/10 rounded-xl pl-9 pr-3 text-sm text-white"
+                  />
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Password"
+                  className="w-full min-h-11 bg-zinc-950 border border-white/10 rounded-xl px-3 text-sm text-white"
+                />
+                <button
+                  type="submit"
+                  disabled={isAuthSubmitting}
+                  className="w-full min-h-11 rounded-xl border border-indigo-400/40 text-indigo-200 hover:bg-indigo-500 hover:text-white transition text-sm font-semibold"
+                >
+                  {authMode === 'signup' ? 'Create Account' : 'Sign In with Email'}
+                </button>
+              </form>
+
+              <button
+                type="button"
+                onClick={() => setAuthMode((prev) => (prev === 'signin' ? 'signup' : 'signin'))}
+                className="mt-4 text-xs text-zinc-400 hover:text-white transition"
+              >
+                {authMode === 'signin' ? 'New here? Create an account.' : 'Already have an account? Sign in.'}
+              </button>
+
+              {authError && <p className="mt-3 text-sm text-red-300">{authError}</p>}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {showIdentitySequence && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={transitionCurtain}
             className="fixed inset-0 z-[210] bg-black/95 backdrop-blur-xl flex items-center justify-center"
           >
             <motion.p
               key={identityWords[identityWordIndex]}
-              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              initial={{ opacity: 0, y: viewportWidth < 640 ? 8 : 14, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 1.02 }}
-              transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, y: viewportWidth < 640 ? -8 : -12, scale: 1.02 }}
+              transition={transitionCurtain}
               className="text-4xl sm:text-6xl font-black tracking-tight text-white"
             >
               {identityWords[identityWordIndex]}
@@ -429,17 +829,25 @@ export default function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6"
+          transition={transitionBase}
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6"
         >
-          <motion.div layoutId={`asset-card-${selectedAsset.id}`} className="max-w-md w-full bg-[#0a0a0a] rounded-[4.5rem] p-12 border border-white/10 relative shadow-2xl overflow-hidden">
-            <div className="absolute top-0 right-0 p-12">
+          <motion.div
+            layoutId={`asset-card-${selectedAsset.id}`}
+            initial={{ opacity: 0, y: 8, scale: 0.99 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.99 }}
+            transition={transitionBase}
+            className="max-w-md w-full bg-[#0a0a0a] rounded-[2rem] sm:rounded-[4.5rem] p-5 sm:p-12 border border-white/10 relative shadow-2xl overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-4 sm:p-12">
                <button onClick={() => setSelectedAsset(null)} className="text-zinc-600 hover:text-white transition"><X size={32} /></button>
             </div>
             
-            <img src={selectedAsset.thumbnail_url || 'https://images.unsplash.com/photo-1514525253361-b83f859b71c0?auto=format&fit=crop&q=80&w=800'} className="w-full aspect-square rounded-[3.5rem] object-cover mb-12 shadow-2xl border border-white/5" alt="" />
+            <img src={selectedAsset.thumbnail_url || 'https://images.unsplash.com/photo-1514525253361-b83f859b71c0?auto=format&fit=crop&q=80&w=800'} className="w-full aspect-square rounded-[1.6rem] sm:rounded-[3.5rem] object-cover mb-6 sm:mb-12 shadow-2xl border border-white/5" alt="" />
             
-            <h2 className="text-5xl font-black mb-2 uppercase tracking-tighter italic leading-none">{selectedAsset.title}</h2>
-            <p className="text-zinc-500 uppercase text-[12px] font-black tracking-[0.4em] mb-12 italic">{selectedAsset.artist_name}</p>
+            <h2 className="text-3xl sm:text-5xl font-black mb-2 uppercase tracking-tighter italic leading-none break-words">{selectedAsset.title}</h2>
+            <p className="text-zinc-500 uppercase text-[11px] sm:text-[12px] font-black tracking-[0.25em] sm:tracking-[0.4em] mb-6 sm:mb-12 italic break-words">{selectedAsset.artist_name}</p>
             
             <button 
               onClick={() => acquireAsset(selectedAsset)}
@@ -451,7 +859,7 @@ export default function App() {
                 selectedAsset.price_wei === null ||
                 !selectedAsset.contract_address
               }
-              className={`w-full py-7 rounded-[2rem] font-black uppercase text-[12px] tracking-[0.3em] transition-all duration-700 shadow-2xl ${
+              className={`w-full min-h-11 py-4 sm:py-7 rounded-[1.2rem] sm:rounded-[2rem] font-black uppercase text-[11px] sm:text-[12px] tracking-[0.18em] sm:tracking-[0.3em] transition-all duration-700 shadow-2xl ${
                 userVault.includes(selectedAsset.id) ||
                 selectedAsset.onchain_content_id === undefined ||
                 selectedAsset.onchain_content_id === null ||

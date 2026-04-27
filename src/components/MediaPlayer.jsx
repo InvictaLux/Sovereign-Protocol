@@ -92,6 +92,7 @@ export default function MediaPlayer({ item, onClose }) {
   const [backupToast, setBackupToast] = useState('');
   const [isMiniPlayer, setIsMiniPlayer] = useState(false);
   const [dragOffsetY, setDragOffsetY] = useState(0);
+  const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
   const mediaRef = useRef(null);
   const touchStartYRef = useRef(0);
 
@@ -410,6 +411,20 @@ export default function MediaPlayer({ item, onClose }) {
     });
   }, [isPlaying, mediaUrl]);
 
+  useEffect(() => {
+    const onResize = () => {
+      const nextWidth = window.innerWidth;
+      setViewportWidth(nextWidth);
+      if (nextWidth >= 640) {
+        setIsMiniPlayer(false);
+        setDragOffsetY(0);
+      }
+    };
+
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const ringRadius = 16;
   const ringCircumference = 2 * Math.PI * ringRadius;
   const ringOffset = ringCircumference - (backupProgress / 100) * ringCircumference;
@@ -438,7 +453,9 @@ export default function MediaPlayer({ item, onClose }) {
     if (isMiniPlayer) return;
     const endY = event.changedTouches[0]?.clientY || 0;
     const delta = endY - touchStartYRef.current;
-    if (delta > 96) {
+    const miniThreshold = Math.max(72, Math.min(132, viewportWidth * 0.16));
+
+    if (delta > miniThreshold) {
       setIsMiniPlayer(true);
       setDragOffsetY(0);
       return;
