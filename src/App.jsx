@@ -14,10 +14,9 @@ import {
   Shield, 
   X, 
   Loader2, 
-  ShoppingBag, 
   Database,
-  Library,
-  PlusSquare,
+  Play,
+  Wrench,
   Fingerprint,
   Verified,
   Sparkles,
@@ -78,9 +77,11 @@ export default function App() {
   const [authError, setAuthError] = useState('');
   const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [toast, setToast] = useState(null);
   const authSheetPanelRef = useRef(null);
   const profileMenuRef = useRef(null);
   const profileButtonRef = useRef(null);
+  const toastTimeoutRef = useRef(null);
 
   const syncStageLabel = {
     BIOMETRIC_AUTH: 'Confirm Face ID / Fingerprint',
@@ -145,6 +146,63 @@ export default function App() {
     }
   };
 
+  const showToast = (message, tone = 'info') => {
+    if (toastTimeoutRef.current) {
+      window.clearTimeout(toastTimeoutRef.current);
+    }
+
+    const toastId = Date.now();
+    setToast({ id: toastId, message, tone });
+
+    toastTimeoutRef.current = window.setTimeout(() => {
+      setToast((currentToast) => (currentToast?.id === toastId ? null : currentToast));
+    }, 3200);
+  };
+
+  const getFriendlyAuthError = (error) => {
+    const signature = `${error?.code || ''} ${error?.message || ''}`.toLowerCase();
+    if (
+      signature.includes('auth/configuration-not-found') ||
+      signature.includes('api_key_http_referrer_blocked') ||
+      signature.includes('identitytoolkit') ||
+      signature.includes('403')
+    ) {
+      return 'Connection Interrupted. Please check your network or try Email Sign-in.';
+    }
+
+    return error?.message || 'Connection Interrupted. Please check your network or try Email Sign-in.';
+  };
+
+  const waitForAuthUser = (expectedUid) => {
+    if (auth.currentUser && (!expectedUid || auth.currentUser.uid === expectedUid)) {
+      return Promise.resolve(auth.currentUser);
+    }
+
+    return new Promise((resolve, reject) => {
+      const timeoutId = window.setTimeout(() => {
+        unsubscribe();
+        reject(new Error('AUTH_USER_TIMEOUT'));
+      }, 4500);
+
+      const unsubscribe = onAuthStateChanged(
+        auth,
+        (nextUser) => {
+          if (!nextUser) return;
+          if (expectedUid && nextUser.uid !== expectedUid) return;
+
+          window.clearTimeout(timeoutId);
+          unsubscribe();
+          resolve(nextUser);
+        },
+        (error) => {
+          window.clearTimeout(timeoutId);
+          unsubscribe();
+          reject(error);
+        }
+      );
+    });
+  };
+
   const handleProviderAuth = async (providerKey) => {
     if (isAuthSubmitting) return;
 
@@ -152,21 +210,28 @@ export default function App() {
     setAuthError('');
 
     try {
+      let authUser;
       if (providerKey === 'google') {
         const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
+        const credential = await signInWithPopup(auth, provider);
+        authUser = credential?.user;
       } else {
         const provider = new OAuthProvider('apple.com');
         provider.addScope('email');
         provider.addScope('name');
-        await signInWithPopup(auth, provider);
+        const credential = await signInWithPopup(auth, provider);
+        authUser = credential?.user;
       }
 
+      await waitForAuthUser(authUser?.uid);
       setShowAuthSheet(false);
       await runPostAuthSequence();
+      showToast('Welcome back, Sovereign.', 'success');
     } catch (error) {
       console.error('Provider auth failed:', error);
-      setAuthError(error?.message || 'Sign-in failed. Try a different method.');
+      const friendlyError = getFriendlyAuthError(error);
+      setAuthError(friendlyError);
+      showToast(friendlyError, 'error');
     } finally {
       setIsAuthSubmitting(false);
     }
@@ -185,17 +250,24 @@ export default function App() {
     setAuthError('');
 
     try {
+      let authUser;
       if (authMode === 'signup') {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        authUser = credential?.user;
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        const credential = await signInWithEmailAndPassword(auth, email, password);
+        authUser = credential?.user;
       }
 
+      await waitForAuthUser(authUser?.uid);
       setShowAuthSheet(false);
       await runPostAuthSequence();
+      showToast('Welcome back, Sovereign.', 'success');
     } catch (error) {
       console.error('Email auth failed:', error);
-      setAuthError(error?.message || 'Email sign-in failed.');
+      const friendlyError = getFriendlyAuthError(error);
+      setAuthError(friendlyError);
+      showToast(friendlyError, 'error');
     } finally {
       setIsAuthSubmitting(false);
     }
@@ -314,6 +386,14 @@ export default function App() {
       window.removeEventListener('pointerdown', onPointerDown);
     };
   }, [showAuthSheet, showProfileMenu]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        window.clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!window.ethereum) return;
@@ -490,7 +570,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             <button
               onClick={handleConnect}
-              className="min-h-11 border border-white/20 px-3 sm:px-4 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-500 shadow-[0_10px_24px_rgba(0,0,0,0.35)] font-bold text-[10px] sm:text-xs tracking-[0.16em] uppercase"
+              className="min-h-11 flex-shrink-0 border border-white/20 px-3 sm:px-4 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-500 shadow-[0_10px_24px_rgba(0,0,0,0.35)] font-bold text-[10px] sm:text-xs tracking-[0.16em] uppercase"
             >
               {isWalletConnecting ? 'Connecting' : walletDisplay}
             </button>
@@ -514,13 +594,19 @@ export default function App() {
         <div className="hidden md:block border-t border-white/5">
           <nav className="max-w-6xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-4 lg:gap-6">
             <button onClick={() => navigateToView('market')} className={`min-h-11 flex items-center gap-2 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'market' ? 'text-white border-b border-indigo-500' : ''}`}>
-              <ShoppingBag size={18} /> Exchange
+              <Shield size={18} />
+              <span className="hidden lg:inline">Exchange</span>
+              <span className="sr-only">Exchange</span>
             </button>
             <button onClick={() => navigateToView('library')} className={`min-h-11 flex items-center gap-2 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'library' ? 'text-white border-b border-indigo-500' : ''}`}>
-              <Library size={18} /> Library
+              <Play size={18} />
+              <span className="hidden lg:inline">Library</span>
+              <span className="sr-only">Library</span>
             </button>
             <button onClick={() => navigateToView('studio')} className={`min-h-11 flex items-center gap-2 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white transition-all ${view === 'studio' ? 'text-white border-b border-indigo-500' : ''}`}>
-              <PlusSquare size={18} /> Studio
+              <Wrench size={18} />
+              <span className="hidden lg:inline">Studio</span>
+              <span className="sr-only">Studio</span>
             </button>
           </nav>
         </div>
@@ -621,19 +707,34 @@ export default function App() {
       <div className="md:hidden fixed inset-x-0 bottom-0 z-[140] border-t border-white/10 bg-black/90 backdrop-blur-xl">
         <nav className="grid grid-cols-3">
           <button onClick={() => navigateToView('market')} className={`min-h-14 flex flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-[0.15em] ${view === 'market' ? 'text-white' : 'text-zinc-500'}`}>
-            <ShoppingBag size={16} />
-            Exchange
+            <Shield size={17} />
+            <span className="sr-only">Exchange</span>
           </button>
           <button onClick={() => navigateToView('library')} className={`min-h-14 flex flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-[0.15em] ${view === 'library' ? 'text-white' : 'text-zinc-500'}`}>
-            <Library size={16} />
-            Library
+            <Play size={17} />
+            <span className="sr-only">Library</span>
           </button>
           <button onClick={() => navigateToView('studio')} className={`min-h-14 flex flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-[0.15em] ${view === 'studio' ? 'text-white' : 'text-zinc-500'}`}>
-            <PlusSquare size={16} />
-            Studio
+            <Wrench size={17} />
+            <span className="sr-only">Studio</span>
           </button>
         </nav>
       </div>
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key={toast.id}
+            initial={{ opacity: 0, y: -12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={transitionFast}
+            className={`fixed top-4 right-4 z-[230] max-w-[calc(100vw-2rem)] rounded-2xl border px-4 py-3 shadow-2xl backdrop-blur-xl ${toast.tone === 'error' ? 'border-red-300/35 bg-red-500/12 text-red-100' : 'border-emerald-300/35 bg-emerald-500/12 text-emerald-100'}`}
+          >
+            <p className="text-xs sm:text-sm font-semibold tracking-[0.02em]">{toast.message}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <button
         onClick={() => setShowProtocolStatus((prev) => !prev)}

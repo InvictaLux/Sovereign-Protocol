@@ -76,12 +76,12 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
 
       <div className="space-y-14">
         <section>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="w-full flex flex-wrap items-center gap-3">
             <motion.button
               type="button"
               onClick={() => setActiveFilter('all')}
               whileTap={{ scale: 0.96 }}
-              className={`min-h-11 px-4 py-2 rounded-full text-xs uppercase tracking-[0.22em] border transition ${activeFilter === 'all' ? 'bg-white text-black border-white' : 'bg-black/40 border-white/20 text-zinc-300 hover:border-white/40'}`}
+              className={`min-h-11 flex-shrink-0 px-4 py-2 rounded-full text-xs uppercase tracking-[0.22em] border transition ${activeFilter === 'all' ? 'bg-white text-black border-white' : 'bg-black/40 border-white/20 text-zinc-300 hover:border-white/40'}`}
             >
               All
             </motion.button>
@@ -91,7 +91,7 @@ export default function MarketView({ marketItems, userVault, setSelectedAsset, o
                 type="button"
                 onClick={() => setActiveFilter(chip.key)}
                 whileTap={{ scale: 0.96 }}
-                className={`min-h-11 px-4 py-2 rounded-full text-xs uppercase tracking-[0.22em] border transition ${activeFilter === chip.key ? 'bg-indigo-500/90 text-white border-indigo-300/60 shadow-[0_0_20px_rgba(99,102,241,0.35)]' : 'bg-black/40 border-white/20 text-zinc-300 hover:border-white/40'}`}
+                className={`min-h-11 flex-shrink-0 px-4 py-2 rounded-full text-xs uppercase tracking-[0.22em] border transition ${activeFilter === chip.key ? 'bg-indigo-500/90 text-white border-indigo-300/60 shadow-[0_0_20px_rgba(99,102,241,0.35)]' : 'bg-black/40 border-white/20 text-zinc-300 hover:border-white/40'}`}
               >
                 {chip.label}
               </motion.button>
